@@ -1,0 +1,110 @@
+/* stylelint-disable selector-class-pattern */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+	body,
+	html {
+		@apply m-0 p-0 w-full h-full overflow-hidden;
+	}
+
+	/** Spacing */
+	.cx,
+	.cy,
+	.cb,
+	.ct,
+	.cr,
+	.cl,
+	.ca {
+		@apply w-full;
+	}
+
+	.cx {
+		@apply px-xs sm:px-sm dk:px-dk 3xl:px-3xl;
+	}
+
+	.cx-1\/2 {
+		@apply px-xs dk:px-sm 3xl:px-dk;
+	}
+
+	.cy {
+		@apply py-xs sm:py-sm dk:py-dk 3xl:py-3xl;
+	}
+
+	.cy-1\/2 {
+		@apply py-xs dk:py-sm 3xl:py-dk;
+	}
+
+	.cb {
+		@apply pb-xs sm:pb-sm dk:pb-dk 3xl:pb-3xl;
+	}
+
+	.cb-1\/2 {
+		@apply pb-xs dk:pb-sm 3xl:pb-dk;
+	}
+
+	.ct {
+		@apply pt-xs sm:pt-sm dk:pt-dk 3xl:pt-3xl;
+	}
+
+	.ct-1\/2 {
+		@apply pt-xs dk:pt-sm 3xl:pt-dk;
+	}
+
+	.cr {
+		@apply pr-xs sm:pr-sm dk:pr-dk 3xl:pr-3xl;
+	}
+
+	.cr-1\/2 {
+		@apply pr-xs dk:pr-sm 3xl:pr-dk;
+	}
+
+	.cl {
+		@apply pl-xs sm:pl-sm dk:pl-dk 3xl:pl-3xl;
+	}
+
+	.cl-1\/2 {
+		@apply pl-xs dk:pl-sm 3xl:pl-dk;
+	}
+
+	.ca {
+		@apply p-xs sm:p-sm dk:p-dk 3xl:p-3xl;
+	}
+
+	.ca-1\/2 {
+		@apply p-xs dk:p-sm 3xl:p-dk;
+	}
+
+	/** Shopify Overwrites */
+	.shopify-payment-button button {
+		@apply btn btn-primary;
+	}
+
+	.logo > svg {
+		height: auto;
+		width: 100%;
+	}
+
+	:disabled {
+		opacity: 0.6;
+		pointer-events: none;
+	}
+}
+
+@layer utilities {
+	
+	input[type="number"] {
+		-moz-appearance: textfield;
+	}
+
+	input[type="number"]::-webkit-inner-spin-button,
+	input[type="number"]::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+}
+
+/** Typeography */
+@import "./_typography/_main";

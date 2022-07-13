@@ -1,0 +1,29 @@
+h1,
+.h1 {
+	@apply text-h1m dk:text-h1d;
+}
+
+h2,
+.h2 {
+	@apply text-h2m dk:text-h2d;
+}
+
+h3,
+.h3 {
+	@apply text-h3m dk:text-h3d;
+}
+
+h4,
+.h4 {
+	@apply text-h4m dk:text-h4d;
+}
+
+h5,
+.h5 {
+	@apply text-h5m dk:text-h5d;
+}
+
+h6,
+.h6 {
+	@apply text-h6m dk:text-h6d;
+}

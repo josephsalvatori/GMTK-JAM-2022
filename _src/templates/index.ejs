@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="" />
+<title>GMTK 2022</title>
+<% if(process.env.NODE_ENV != "production"){ %><script src="https://cdn.tailwindcss.com/" type="text/javascript"></script>
+<script type="text/javascript">
+tailwind.config = {
+	theme: {},
+	corePlugins: {
+		preflight: false,
+	}
+}
+</script><% } %>
+<% htmlWebpackPlugin.files.css.forEach(function(file){ %><link href="/assets/<%- file.split('/')[5] %>" rel="stylesheet" /><% }) %>
+</head>
+<body>
+<header>
+
+</header>
+<main>
+	<game-jam>
+		<canvas></canvas>
+	</game-jam>
+</main>
+<footer>
+
+</footer>
+<% htmlWebpackPlugin.files.js.forEach(function(file){ %><script type="text/javascript" src="/assets/<%- file.split('/')[5] %>"></script><% }) %>
+</body>
+</html>

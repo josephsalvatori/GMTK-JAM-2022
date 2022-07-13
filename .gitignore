@@ -1,0 +1,28 @@
+!.gitignore
+
+# Compiled
+compiled
+dist
+build/index.html
+build/assets/_global.css
+build/assets/_main.js
+build/assets/bundle.*.js
+!build/app.js
+!build/assets/svgs
+!build/assets/imgs
+
+# Node Package Manager
+node_modules
+
+# Vagrant
+bin
+.vagrant
+.idea/
+npm-debug.log
+
+# Stray Files
+.DS_Store
+
+# Built Files
+
+# TODO: exclude logs
