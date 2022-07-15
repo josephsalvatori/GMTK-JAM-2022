@@ -1,4 +1,3 @@
-import { getViewport, parseQueryString } from "@zero-studios/library";
 import LazyLoad from "vanilla-lazyload";
 
 /** Document Ready */
@@ -6,18 +5,12 @@ const onReady = ()=>{
 
 	/** Setup our base store */
 	window.Game = window.Game || {};
-	
-	try {
-		window.Game.queryParams = parseQueryString();
-	} catch(err){
-		window.Game.queryParams = undefined;
-	}
 
-	window.Game.windowHeight = getViewport().height;
-	window.Game.windowWidth = getViewport().width;
+	window.Game.windowHeight = window.innerHeight;
+	window.Game.windowWidth = window.innerWidth;
 
 	/** vh variable set */
-	let vh = getViewport().height * 0.01;
+	let vh = window.innerHeight * 0.01;
 
 	document.body.style.setProperty('--vh', `${vh}px`);
 
@@ -55,10 +48,10 @@ const onResize = ()=>{
 	resizeTimeout = setTimeout(()=>{
 
 		window.Game = window.Game || {};
-		window.Game.windowHeight = getViewport().height;
-		window.Game.windowWidth = getViewport().width;
+		window.Game.windowHeight = window.innerHeight;
+		window.Game.windowWidth = window.innerWidth;
 
-		let vh = getViewport().height * 0.01;
+		let vh = window.innerHeight * 0.01;
 
 		document.body.style.setProperty('--vh', `${vh}px`);
 		

@@ -1,0 +1,83 @@
+Theme: Roll of the dice
+
+Legend:
+@ - Very considered
+# - Difficult to consider
+
+- How do you make randomness fun?
+	- Element of surprise
+		- Reward vs. input or time
+	- Reward window is wide
+	- Visual?
+
+- Average person plays for 10 minutes
+	- value in Progression
+		- 5 playthroughs / 2 minutes gameplay each
+		
+@ Duration played scales difficulty
+	- Levels get harder longer you play
+	- Enemies stronger / more damaging?
+	- Adjustable values on difficuly scales
+		- Base multiplier  # how quickly the increase happens (extend/contract Sine)
+		- Rate multiplier  # how quickly difficulty jumps (lowers/raises Sine)
+
+@ Progression across games
+
+@ Progression within single game
+
+@ Selected Challenges
+
+## Gameplay
+	- Distributable Enemies
+	
+
+- Randomness
+	- Config
+		--- World
+			- Velocity
+			- Zoom/FOV?
+			- Animation Speed?
+			- Scale?
+			- Filters
+			- Assets?
+			- Collision
+		- Object
+			- 
+		- Controls?
+		- Multiple-playthroughs
+			@  Progression
+				- Growth
+					- Milestones (exp table)
+						- duration?
+						- per object?
+					- 
+				@ Weighting randomness
+					- Bound to choice
+					- Bound to length of time
+			@  Selected Challenge (risk increases reward)
+				- 75% negative vs 25% positive benefit
+				- Challenges
+					- World config
+					- Character settings
+			- Increased reward?
+			- World objects
+				- Additional?
+				- Higher rewards?
+			- Character
+				- Stats / gets stronger
+				- 
+	- Game
+		- Gameplay? - might be tough
+		- Combination
+			- Set objects, and how they combine becomes random
+		- Goal
+			- 
+		-
+- Luck
+- Literal dice
+	- Not in control
+	- Physics
+- DND
+	- 
+
+- 
