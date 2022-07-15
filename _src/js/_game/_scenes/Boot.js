@@ -17,7 +17,7 @@ export default class Boot extends Phaser.Scene {
 		let data = new PlayerData();
 
 		/** Establish data manager objects */
-		this.registry.set("player", data.init());
+		this.registry.set("player", data.init()); 
 	}
 
 	/** Used for preloading assets (image, audio) into the scene */
