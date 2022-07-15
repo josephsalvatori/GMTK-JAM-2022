@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export default class Template extends Phaser.GameObjects.Sprite {
+export default class Enemy extends Phaser.GameObjects.Sprite {
 	
 	/**
 	 * @constructor
@@ -15,9 +15,20 @@ export default class Template extends Phaser.GameObjects.Sprite {
 		super(scene, x, y, frame, texture);
 
 		scene.add.existing(this);
+		scene.physics.add.existing(this);
+
+		/**
+		 * Physics
+		 */
+		this.body.setCollideWorldBounds(true);
+		this.body.setSize(64, 64);
+
+		/**
+		 * Color
+		 */
+		this.tint = Math.random() * 0xffffff;
 	}
 
-	/** The run, where you'll adjust values/movement */
 	update() {
 
 	}

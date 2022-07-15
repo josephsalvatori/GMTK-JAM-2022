@@ -12,7 +12,12 @@ Legend:
 
 - Average person plays for 10 minutes
 	- value in Progression
-		- 5 playthroughs / 2 minutes gameplay each
+		- 5 playthroughs / 2 minutes each session
+	- Goal:
+		- Player gets better as they restart sessions
+		- Player lives longer within a session
+		- Earn more rewards at the end of a session based on duration of session
+		- Rewards carry through sessions
 		
 @ Duration played scales difficulty
 	- Levels get harder longer you play
@@ -26,10 +31,24 @@ Legend:
 @ Progression within single game
 
 @ Selected Challenges
+	- Apply multiplier to session rewards
+	- Chance to be good value (25%)
+	- Chance to be bad (challenging) value (75%)
+	- Six-sided die roll for this?
+		- 6 = benefit value
+		- 1 ... 5 = penalty value
 
-## Gameplay
+Gameplay
 	- Distributable Enemies
 	
+Questions
+	- Is there value in exploration?
+	- How much is randomized?
+	- 
+
+
+
+
 
 - Randomness
 	- Config

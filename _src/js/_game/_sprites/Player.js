@@ -17,6 +17,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 
+		this.config = {
+			velocity: 100
+		};
+
 		/**
 		 * Controls
 		 */
@@ -32,6 +36,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		 */
 		this.body.setCollideWorldBounds(true);
 		this.body.setSize(32, 32);
+		this.body.onCollide = true;
 
 		/**
 		 * Color
@@ -41,19 +46,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 	update() {
 
+		let playerData = this.scene.registry.get("player");
+
 		/** Stand still */
 		this.body.setVelocity(0);
 
 		/** Up */
 		if(this.controls.W?.isDown) {
 
-			this.body.setVelocityY(-1100);
+			this.body.velocity.y = (this.config.velocity * playerData.speed) * -1;
 		}
 
 		/** Left */
 		if(this.controls.A?.isDown) {
 
-			this.body.setVelocityX(-1100);
+			this.body.velocity.x = (this.config.velocity * playerData.speed) * -1;
 			this.checkFlip();
 			this.body.setOffset(32, 0);
 		}
@@ -61,13 +68,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		/** Down */
 		if(this.controls.S?.isDown){
 
-			this.body.velocity.y = 1100;
+			this.body.velocity.y = (this.config.velocity * playerData.speed);
 		}
 
 		/** Right */
 		if(this.controls.D?.isDown) {
 
-			this.body.setVelocityX(1100);
+			this.body.velocity.x = (this.config.velocity * playerData.speed);
 			this.checkFlip();
 			this.body.setOffset(0, 0);
 		}

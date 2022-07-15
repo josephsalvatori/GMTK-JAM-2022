@@ -1,13 +1,10 @@
-export default class PlayerData {
+export default class TemplateData {
 
 	constructor(registry, object = {}) {
 
 		/** Player data defaults */
-		this.name = "player";
-		this.data = {
-			"health": 100,
-			"speed": 10
-		};
+		this.name = "progression";
+		this.data = {};
 
 		/** Data store in window Object - hate get/set of DataManager */
 		window.Game.data = window.Game.data || {};

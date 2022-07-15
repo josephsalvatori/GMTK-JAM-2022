@@ -14,10 +14,11 @@ export default class Boot extends Phaser.Scene {
 	/** Used to prepare data */
 	init() {
 
-		let data = new PlayerData();
+		window.Data = window.Data || {};
+		window.Data.player = new PlayerData(this.registry);
 
 		/** Establish data manager objects */
-		this.registry.set("player", data.init()); 
+		
 	}
 
 	/** Used for preloading assets (image, audio) into the scene */
@@ -27,9 +28,6 @@ export default class Boot extends Phaser.Scene {
 
 	/** Used to add objects to the scene */
 	create(data) {
-
-		console.log("Open Menu");
-
 		this.scene.start("Menu");
 	}
 
