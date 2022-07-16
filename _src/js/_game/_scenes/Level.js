@@ -191,7 +191,7 @@ export default class Level extends Phaser.Scene {
 		this.arenaObjectLayer.setDepth(3);
 		this.arenaTrapLayer.setDepth(2);
 		this.arenaGroundLayer.setDepth(1);
-		this.arenaGroundLayer.setAlpha(0.5); // Debug alpha
+		// this.arenaGroundLayer.setAlpha(0.5); // Debug alpha
 		
 		/** Debug Arena */
 		// this.arena.renderDebug(this.add.graphics(), {
