@@ -84,7 +84,10 @@ export default class Level extends Phaser.Scene {
 		let tilesetIndex = Math.floor(Math.random() * tilesets.length);
 
 		this.load.image("tiles", tilesets[tilesetIndex]);
-		this.load.image("player", "/assets/imgs/player_debug.png");
+		this.load.spritesheet("player", "/assets/imgs/player_debug.png", {
+			frameWidth: 32,
+			frameHeight: 32
+		});
 	}
 
 	drawArena() {
@@ -226,7 +229,7 @@ export default class Level extends Phaser.Scene {
 
 		/** Player vs. Traps */
 		this.physics.add.overlap(this.player, this.arenaTrapLayer, (player, tile)=>{
-
+			this.player.onOverlap(tile);
 		}, null, this);
 
 		/** Enemies vs. Tilemap */

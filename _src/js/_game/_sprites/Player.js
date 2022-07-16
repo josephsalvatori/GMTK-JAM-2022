@@ -18,6 +18,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 
+		this.setTexture(texture);
+
 		this.path = null;
 		this.config = {
 			baseVelocity: 100,
@@ -57,7 +59,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		/**
 		 * Color
 		 */
-		this.tint = Math.random() * 0xffffff;
+		// this.tint = Math.random() * 0xffffff;
 
 		/**
 		 * Abilities
@@ -118,8 +120,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		/** Left */
 		if(this.controls.A?.isDown) {
 			this.setVelocityX((v * playerData.speed) * -1);
-			this.checkFlip();
-			this.body.setOffset(32, 0);
 		}
 
 		/** Down */
@@ -130,55 +130,71 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		/** Right */
 		if(this.controls.D?.isDown) {
 			this.setVelocityX((v * playerData.speed));
-			this.checkFlip();
-			this.body.setOffset(0, 0);
-			this.body.setR
 		}
 
 		/** Reset to single path controls - needed for rotation */
 		if(this.controls.W?.isDown && this.controls.A?.isDown) { // UP / LEFT
-			this.setRotation(315);
+			this.facingDir = ["up", "left"];
+			this.setRotation(Phaser.Math.DegToRad(315));
 		} else if(this.controls.W?.isDown && this.controls.D?.isDown) { // UP / RIGHT
-			this.setRotation(45);
+			this.facingDir = ["up", "right"];
+			this.setRotation(Phaser.Math.DegToRad(45));
 		} else if(this.controls.S?.isDown && this.controls.A?.isDown) { // DOWN / LEFT
-			this.setRotation(225);
+			this.facingDir = ["down", "left"];
+			this.setRotation(Phaser.Math.DegToRad(225));
 		} else if(this.controls.S?.isDown && this.controls.D?.isDown) { // DOWN / RIGHT
-			this.setRotation(135);
+			this.facingDir = ["up", "right"];
+			this.setRotation(Phaser.Math.DegToRad(135));
 		} else if(this.controls.W?.isDown) { // Up
+			this.facingDir = ["up", ""];
 			this.setRotation(0);
 		} else if(this.controls.A?.isDown) { // Left
-			this.setRotation(270);
+			this.facingDir = ["", "left"];
+			this.setRotation(Phaser.Math.DegToRad(270));
 		} else if(this.controls.S?.isDown) { // Down
-			this.setRotation(180);
+			this.facingDir = ["down", ""];
+			this.setRotation(Phaser.Math.DegToRad(180));
 		} else if(this.controls.D?.isDown) { // Right
-			this.setRotation(90);
+			this.facingDir = ["", "right"];
+			this.setRotation(Phaser.Math.DegToRad(90));
 		}
 	}
 
-	checkFlip() {
+	// checkFlip() {
 
-		if(this.body.velocity.x < 0) {
-			this.scaleX = -1;
-		} else {
-			this.scaleX = 1;
-		}
-	}
+	// 	if(this.body.velocity.x < 0) {
+	// 		this.scaleX = -1;
+	// 	} else {
+	// 		this.scaleX = 1;
+	// 	}
+	// }
 
 	/**
-	 * 
+	 * COLLISIONS
 	 * @param {Object} target object colliding with
-	 * @param {String} dir direction of collision
+	 * @param {String} hitDirection direction of collision
 	 */
-	onCollide(target, dir) {
+	onCollide(target, hitDirection) {
 
 		/** Collision during a Dash */
 		if(this.config.isColliding === false && this.config.isDashing === true){
 
 			this.config.isColliding = true; // Resets upon dash
 
-			console.log("ATTACK", target, dir);
+			console.log("ATTACK", target, hitDirection, this.facingDir);
 		} else {
-			console.log("YOU'RE HIT", target, dir);
+			console.log("YOU'RE HIT", target, hitDirection, this.facingDir);
 		}
+	}
+
+	/**
+	 * OVERLAPS
+	 * @param {Object} target object overlap with
+	 */
+	onOverlap(target) {
+
+		if(target.index === -1) return; // no tile
+
+		console.log("OVERLAPPING A TRAP", target);
 	}
 }
