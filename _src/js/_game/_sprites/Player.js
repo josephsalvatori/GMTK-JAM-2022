@@ -132,18 +132,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 		}
 
 		/** Reset to single path controls - needed for rotation */
-		if(this.controls.W?.isDown && this.controls.A?.isDown) { // UP / LEFT
-			this.facingDir = ["up", "left"];
-			this.setRotation(Phaser.Math.DegToRad(315));
+		if(this.controls.S?.isDown && this.controls.D?.isDown) { // DOWN / RIGHT
+			this.facingDir = ["up", "right"];
+			this.setRotation(Phaser.Math.DegToRad(135));
 		} else if(this.controls.W?.isDown && this.controls.D?.isDown) { // UP / RIGHT
 			this.facingDir = ["up", "right"];
 			this.setRotation(Phaser.Math.DegToRad(45));
 		} else if(this.controls.S?.isDown && this.controls.A?.isDown) { // DOWN / LEFT
 			this.facingDir = ["down", "left"];
 			this.setRotation(Phaser.Math.DegToRad(225));
-		} else if(this.controls.S?.isDown && this.controls.D?.isDown) { // DOWN / RIGHT
-			this.facingDir = ["up", "right"];
-			this.setRotation(Phaser.Math.DegToRad(135));
+		} else if(this.controls.W?.isDown && this.controls.A?.isDown) { // UP / LEFT
+			this.facingDir = ["up", "left"];
+			this.setRotation(Phaser.Math.DegToRad(315));
 		} else if(this.controls.W?.isDown) { // Up
 			this.facingDir = ["up", ""];
 			this.setRotation(0);
