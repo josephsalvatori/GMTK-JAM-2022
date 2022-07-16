@@ -51,6 +51,12 @@ export default class Menu extends Phaser.Scene {
 
 	/** Used to add objects to the scene */
 	create(data) {
+
+		/** DEBUG SKIP MENU */
+		this.scene.start("Level", {
+			"message": "Start Level"
+		});
+		/** END DEBUG SKIP MENU */
 		
 		const { width, height } = this.scale;
 

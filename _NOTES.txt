@@ -27,16 +27,18 @@ Legend:
 		- Rate multiplier  # how quickly difficulty jumps (lowers/raises Sine)
 
 @ Progression across games
-
-@ Progression within single game
-
-@ Selected Challenges
-	- Apply multiplier to session rewards
+@ Selected Rewards (Between Sessions?)
+	- Apply multiplier to session rewardsa
 	- Chance to be good value (25%)
 	- Chance to be bad (challenging) value (75%)
 	- Six-sided die roll for this?
 		- 6 = benefit value
 		- 1 ... 5 = penalty value
+
+@ Arena - 6 doors
+	- 1 N, 1 S, 2 E, 2 W
+	- Killing all enemies 
+
 
 Gameplay
 	- Distributable Enemies

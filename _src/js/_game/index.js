@@ -28,6 +28,7 @@ export default class GameJam extends HTMLElement {
 				default: "arcade",
 				arcade: {
 					gravity: { y: 0 },
+					tileBias: 32, // !IMPORTANT - needed for proper tile collision detection, must match tilesize
 					debug: true
 				}
 			},

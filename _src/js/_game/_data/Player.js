@@ -6,7 +6,7 @@ export default class PlayerData {
 		this.name = "player";
 		this.data = {
 			"health": 100,
-			"speed": 10
+			"speed": 5
 		};
 
 		/** Data store in window Object - hate get/set of DataManager */
