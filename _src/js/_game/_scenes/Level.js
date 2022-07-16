@@ -68,6 +68,8 @@ export default class Level extends Phaser.Scene {
 	/** Used to prepare data */
 	init() {
 		console.log("getData", this.registry.get("player"));
+
+		this.scene.launch("HUD");
 	}
 
 	/** Used for preloading assets (image, audio) into the scene */
@@ -241,7 +243,7 @@ export default class Level extends Phaser.Scene {
 		 * Collision
 		 */
 		/** Player vs. Tilemap */
-		this.physics.add.collider(this.player, this.arenaObjectLayer, (player, tile)=>{
+		this.physics.add.collider(this.player, this.arenaObjectLayer, (player, tile) => {
 
 			if(this.player.body.blocked.left){
 				this.player.onCollide(tile, "left");
@@ -256,19 +258,21 @@ export default class Level extends Phaser.Scene {
 		}, null, this);
 
 		/** Player vs. Traps */
-		this.physics.add.overlap(this.player, this.arenaTrapLayer, (player, tile)=>{
+		this.physics.add.overlap(this.player, this.arenaTrapLayer, (player, tile) => {
 			this.player.onOverlap(tile);
 		}, null, this);
 
 		/** Enemies vs. Tilemap */
-		this.physics.add.collider(this.enemies, this.arenaObjectLayer, (enemy, tile)=>{
+		this.physics.add.collider(this.enemies, this.arenaObjectLayer, (enemy, tile) => {
 			
 		}, null, this);
 
 		/** Player vs. Enemies */
-		this.physics.add.collider(this.player, this.enemies, (player, enemy)=>{
+		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 			this.player.onCollide(enemy);
 		});
+
+		// this.displayClock.setScrollFactor(0);
 
 		/** Camera - follow player */
 		this.cameras.main.zoom = this.zoom;
@@ -278,7 +282,7 @@ export default class Level extends Phaser.Scene {
 
 	/** Used to update the game, like a run function for the scene */
 	update(time, delta) {
-		
+
 		/** Update our player */
 		this.player.update();
 	}

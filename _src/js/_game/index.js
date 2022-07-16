@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import Boot from "Game/_scenes/Boot";
 import Menu from "Game/_scenes/Menu";
 import Level from "Game/_scenes/Level";
+import HUD from "Game/_scenes/HUD";
 
 /** Debug */
 import SceneWatcherPlugin from "phaser-plugin-scene-watcher";
@@ -39,7 +40,8 @@ export default class GameJam extends HTMLElement {
 			scene: [
 				Boot,
 				Menu,
-				Level
+				Level,
+				HUD
 			],
 			/** Some debug object plugins */
 			plugins: {

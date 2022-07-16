@@ -1,4 +1,3 @@
-import { toHash } from "ajv/dist/compile/util";
 import Phaser from "phaser";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
