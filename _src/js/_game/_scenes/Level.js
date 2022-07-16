@@ -23,14 +23,14 @@ export default class Level extends Phaser.Scene {
 		 * Spawning Beds 
 		 */
 
-		this.spawnSize = 4;
-		this.tileConfig.spawnSize = 4;
+		this.tileConfig.spawnSize = 4; // Size of gate spawns
+		this.tileConfig.graceArea = 2; // space between walls & obstacles
 		this.tileConfig.gates = {
 			N: {
 				x1: (this.tileConfig.x / 2) - (this.tileConfig.spawnSize / 2),
 				x2: (this.tileConfig.x / 2) + (this.tileConfig.spawnSize / 2),
 				y1: 0,
-				y2: this.spawnSize
+				y2: this.tileConfig.spawnSize
 			},
 			S: {
 				x1: (this.tileConfig.x / 2) - (this.tileConfig.spawnSize / 2),
@@ -72,74 +72,98 @@ export default class Level extends Phaser.Scene {
 
 	/** Used for preloading assets (image, audio) into the scene */
 	preload() {
-		this.load.image("tiles", "/assets/imgs/drawtiles.png");
+
+		/** Random tileset */
+		let tilesets = [
+			"/assets/imgs/tileset_debug.png",
+			"/assets/imgs/tileset_debug.png",
+			"/assets/imgs/tileset_debug.png",
+			"/assets/imgs/tileset_debug.png"
+		];
+
+		let tilesetIndex = Math.floor(Math.random() * tilesets.length);
+
+		this.load.image("tiles", tilesets[tilesetIndex]);
+		this.load.image("player", "/assets/imgs/player_debug.png");
 	}
 
 	drawArena() {
 
 		this.level = [];
+		this.enemies = 0;
+		this.wave = 0;
+		
+		let neutralSlowTileWeight = [
+			{ index: -1, weight: 200 },	// transparent
+			{ index: 0, weight: 160 },	// base neutral
+			{ index: 1, weight: 20 },	// neutral variation 2
+			{ index: 2, weight: 16 },	// neutral variation 3
+			{ index: 3, weight: 10 },	// neutral variation 4
+			{ index: 4, weight: 8 },	// neutral variation 5
+			{ index: 10, weight: 4 },	// slowdown variant 1
+			{ index: 11, weight: 2 },	// slowdown variant 2
+			{ index: 12, weight: 1 },	// slowdown variant 3
+			{ index: 13, weight: 1 }	// slowdown variant 4
+		];
 
-		/** Generate tilemap Rows */
-		for(let i = 0; i < this.tileConfig.y; i++){
+		let obstacleTileWeight = [
+			{ index: -1, weight: 1200 }, // transparent
+			{ index: 7, weight: 4 },	// obstacle variation 1
+			{ index: 8, weight: 2 },	// obstacle variation 2
+			{ index: 9, weight: 1 },	// obstacle variation 3
+		];
 
-			/** Generate tilemap columns */
-			for(let j = 0; j < this.tileConfig.x; j++){
-
-				if(!this.level[i]) this.level[i] = [];
-
-				/** Gates N & S */
-				if(
-					i < this.tileConfig.gates.N.y2 && j >= this.tileConfig.gates.N.x1 && j < this.tileConfig.gates.N.x2 ||
-					i >= this.tileConfig.gates.S.y1 && j >= this.tileConfig.gates.S.x1 && j < this.tileConfig.gates.S.x2
-				){
-
-					this.level[i][j] = 8;
-
-					continue;
-				}
-
-				/** Gates W1, W2, E1, E2 */
-				if(
-					j < this.tileConfig.gates.W1.x2 && i >= this.tileConfig.gates.W1.y1 && i < this.tileConfig.gates.W1.y2 ||
-					j < this.tileConfig.gates.W2.x2 && i >= this.tileConfig.gates.W2.y1 && i < this.tileConfig.gates.W2.y2 ||
-					j >= this.tileConfig.gates.E1.x1 && i >= this.tileConfig.gates.E1.y1 && i < this.tileConfig.gates.E1.y2 ||
-					j >= this.tileConfig.gates.E2.x1 && i >= this.tileConfig.gates.E2.y1 && i < this.tileConfig.gates.E2.y2
-				){
-
-					this.level[i][j] = 8;
-
-					continue;
-				}
-
-				/** Set outside walls */
-				if(i < this.tileConfig.spawnSize || i >= (this.tileConfig.y - this.tileConfig.spawnSize) || j < this.tileConfig.spawnSize || j >= (this.tileConfig.x - this.tileConfig.spawnSize)){
-
-					this.level[i][j] = 6;
-
-					continue;
-				}
-
-				this.level[i][j] = 0;
-			}
-		}
+		let trapTileWeight = [
+			{ index: -1, weight: 1200 }, // transparent
+			{ index: 14, weight: 3 },	// trap variation 1
+			{ index: 15, weight: 2 }	// trap variation 2
+		];
 
 		this.arena = this.make.tilemap({
-			data: this.level,
 			tileWidth: this.tileConfig.size,
-			tileHeight: this.tileConfig.size
+			tileHeight: this.tileConfig.size,
+			width: this.tileConfig.x,
+			height: this.tileConfig.y
 		});
 
 		let tileset = this.arena.addTilesetImage("tiles", null, 32, 32);
 
-		this.arenaLayer = this.arena.createLayer(0, tileset, 0, 0);
-		this.arena.setCollision([6], true);
-		this.arenaLayer.setDepth(2);
+		this.arenaGroundLayer = this.arena.createBlankLayer(0, tileset);
+		this.arenaObjectLayer = this.arena.createBlankLayer(1, tileset);
+		this.arenaTrapLayer = this.arena.createBlankLayer(2, tileset)
 
+		/** Place tiles */
+		this.arenaObjectLayer.fill(5, 0, 0, this.arena.width, this.tileConfig.spawnSize); // top wall
+		this.arenaObjectLayer.fill(5, 0, (this.arena.height - this.tileConfig.spawnSize), this.arena.width, this.tileConfig.spawnSize); // bottom wall
+		this.arenaObjectLayer.fill(5, 0, 0, this.tileConfig.spawnSize, this.arena.height); // left wall
+		this.arenaObjectLayer.fill(5, (this.arena.width - this.tileConfig.spawnSize), 0, this.tileConfig.spawnSize, this.arena.height); // right wall
+		this.arenaObjectLayer.weightedRandomize(obstacleTileWeight, (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.arena.width - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))), (this.arena.height - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))));
+		this.arenaTrapLayer.weightedRandomize(trapTileWeight, (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.arena.width - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))), (this.arena.height - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))));
+		this.arenaGroundLayer.weightedRandomize(neutralSlowTileWeight, this.tileConfig.spawnSize, this.tileConfig.spawnSize, (this.arena.width - (this.tileConfig.spawnSize * 2)), (this.arena.height - (this.tileConfig.spawnSize * 2)));
+
+		/** Gates */
+		// TODO: Gates
+		// this.arenaObjectLayer.putTilesAt([
+		// 	{}
+		// ]);
+
+		/** Spawning Area */
+		// TODO: Spawning Area
+		// this.arenaGroundLayer.putTilesAt([
+		// 	{}
+		// ])
+
+		/** Add collision */
+		this.arena.setCollision([5, 6, 7, 8, 9], true, true, this.arenaObjectLayer, true);
+		this.arenaObjectLayer.setDepth(3);
+		this.arenaTrapLayer.setDepth(2);
+		this.arenaGroundLayer.setDepth(1);
+		this.arenaGroundLayer.setAlpha(0.5); // Debug alpha
+		
 		/** Debug Arena */
-		this.arenaLayer.renderDebug(this.add.graphics(), {
-			tileColor: null,
-
-		});
+		// this.arena.renderDebug(this.add.graphics(), {
+		// 	tileColor: null
+		// });
 	}
 
 	/** Used to add objects to the scene */
@@ -148,7 +172,6 @@ export default class Level extends Phaser.Scene {
 		this.zoom = 1;
 		this.scale = 1 / this.zoom;
 		this.physics.world.setBounds(0, 0, this.tileConfig.size * this.tileConfig.x, this.tileConfig.size * this.tileConfig.y);
-		this.physics.world.veloc
 
 		/** Grid */
 		this.grid = this.add.grid(0, 0, this.tileConfig.size * this.tileConfig.x, this.tileConfig.size * this.tileConfig.y, this.tileConfig.size, this.tileConfig.size, undefined, undefined, 0xffffff, 0.25);
@@ -156,7 +179,7 @@ export default class Level extends Phaser.Scene {
 		this.grid.setDepth(1);
 
 		/** Player */
-		this.player = new Player(this, this.physics.world.bounds.width / 2, this.physics.world.bounds.height / 2, "Player");
+		this.player = new Player(this, this.physics.world.bounds.width / 2, this.physics.world.bounds.height / 2, "player");
 		this.player.setOrigin(0.5);
 		this.player.setDepth(2);
 
@@ -187,7 +210,7 @@ export default class Level extends Phaser.Scene {
 		 * Collision
 		 */
 		/** Player vs. Tilemap */
-		this.physics.add.collider(this.player, this.arenaLayer, (player, tile)=>{
+		this.physics.add.collider(this.player, this.arenaObjectLayer, (player, tile)=>{
 
 			if(this.player.body.blocked.left){
 				this.player.onCollide(tile, "left");
@@ -201,8 +224,13 @@ export default class Level extends Phaser.Scene {
 			
 		}, null, this);
 
+		/** Player vs. Traps */
+		this.physics.add.overlap(this.player, this.arenaTrapLayer, (player, tile)=>{
+
+		}, null, this);
+
 		/** Enemies vs. Tilemap */
-		this.physics.add.collider(this.enemies, this.arenaLayer, (enemy, tile)=>{
+		this.physics.add.collider(this.enemies, this.arenaObjectLayer, (enemy, tile)=>{
 			
 		}, null, this);
 
