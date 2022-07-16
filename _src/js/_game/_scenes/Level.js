@@ -76,9 +76,7 @@ export default class Level extends Phaser.Scene {
 		/** Random tileset */
 		let tilesets = [
 			"/assets/imgs/tileset_debug.png",
-			"/assets/imgs/tileset_debug.png",
-			"/assets/imgs/tileset_debug.png",
-			"/assets/imgs/tileset_debug.png"
+			"/assets/imgs/tileset_stone_water_sand_lava.png",
 		];
 
 		let tilesetIndex = Math.floor(Math.random() * tilesets.length);
@@ -95,31 +93,61 @@ export default class Level extends Phaser.Scene {
 		this.level = [];
 		this.enemies = 0;
 		this.wave = 0;
+
+		/**
+		 * Tileset
+		 * 	- 0-9: Floor
+		 * 	- 10-13: Wall
+		 * 	- 14: Gate
+		 * 	- 15-20: Obstacle
+		 * 	- 21-27: Slow Floor
+		 * 	- 28-31: Traps
+		 */
 		
 		let neutralSlowTileWeight = [
-			{ index: -1, weight: 200 },	// transparent
-			{ index: 0, weight: 160 },	// base neutral
-			{ index: 1, weight: 20 },	// neutral variation 2
-			{ index: 2, weight: 16 },	// neutral variation 3
-			{ index: 3, weight: 10 },	// neutral variation 4
-			{ index: 4, weight: 8 },	// neutral variation 5
-			{ index: 10, weight: 4 },	// slowdown variant 1
-			{ index: 11, weight: 2 },	// slowdown variant 2
-			{ index: 12, weight: 1 },	// slowdown variant 3
-			{ index: 13, weight: 1 }	// slowdown variant 4
+			{ index: 0, weight: 240 },	// base neutral
+			{ index: 1, weight: 140 },	// neutral variation 2
+			{ index: 2, weight: 80 },	// neutral variation 3
+			{ index: 3, weight: 70 },	// neutral variation 4
+			{ index: 4, weight: 50 },	// neutral variation 5
+			{ index: 5, weight: 40 },	// neutral variation 6
+			{ index: 6, weight: 20 },	// neutral variation 7
+			{ index: 7, weight: 18 },	// neutral variation 8
+			{ index: 8, weight: 16 },	// neutral variation 9
+			{ index: 9, weight: 14 },	// neutral variation 10
+			{ index: 21, weight: 10 },	// slowdown variant 1
+			{ index: 22, weight: 8 },	// slowdown variant 2
+			{ index: 23, weight: 6 },	// slowdown variant 3
+			{ index: 24, weight: 5 },	// slowdown variant 4
+			{ index: 25, weight: 4 },	// slowdown variant 5
+			{ index: 26, weight: 3 },	// slowdown variant 6
+			{ index: 27, weight: 2 },	// slowdown variant 7
+			{ index: 28, weight: 1 }	// slowdown variant 8
 		];
 
 		let obstacleTileWeight = [
 			{ index: -1, weight: 1200 }, // transparent
-			{ index: 7, weight: 4 },	// obstacle variation 1
-			{ index: 8, weight: 2 },	// obstacle variation 2
-			{ index: 9, weight: 1 },	// obstacle variation 3
+			{ index: 15, weight: 4 },	// obstacle variation 1
+			{ index: 16, weight: 3 },	// obstacle variation 2
+			{ index: 17, weight: 2 },	// obstacle variation 3
+			{ index: 18, weight: 2 },	// obstacle variation 4
+			{ index: 19, weight: 1 },	// obstacle variation 5
+			{ index: 20, weight: 1 }	// obstacle variation 6
 		];
 
 		let trapTileWeight = [
 			{ index: -1, weight: 1200 }, // transparent
-			{ index: 14, weight: 3 },	// trap variation 1
-			{ index: 15, weight: 2 }	// trap variation 2
+			{ index: 28, weight: 3 },	// trap variation 1
+			{ index: 29, weight: 2 },	// trap variation 2
+			{ index: 30, weight: 2 },	// trap variation 3
+			{ index: 31, weight: 2 }	// trap variation 4
+		];
+
+		let wallWeight = [
+			{ index: 10, weight: 2 },	// wall variation 1
+			{ index: 11, weight: 2 },	// wall variation 2
+			{ index: 12, weight: 2 },	// wall variation 3
+			{ index: 13, weight: 2 }	// wall variation 4
 		];
 
 		this.arena = this.make.tilemap({
@@ -136,10 +164,10 @@ export default class Level extends Phaser.Scene {
 		this.arenaTrapLayer = this.arena.createBlankLayer(2, tileset)
 
 		/** Place tiles */
-		this.arenaObjectLayer.fill(5, 0, 0, this.arena.width, this.tileConfig.spawnSize); // top wall
-		this.arenaObjectLayer.fill(5, 0, (this.arena.height - this.tileConfig.spawnSize), this.arena.width, this.tileConfig.spawnSize); // bottom wall
-		this.arenaObjectLayer.fill(5, 0, 0, this.tileConfig.spawnSize, this.arena.height); // left wall
-		this.arenaObjectLayer.fill(5, (this.arena.width - this.tileConfig.spawnSize), 0, this.tileConfig.spawnSize, this.arena.height); // right wall
+		this.arenaObjectLayer.weightedRandomize(wallWeight, 0, 0, this.arena.width, this.tileConfig.spawnSize); // top wall
+		this.arenaObjectLayer.weightedRandomize(wallWeight, 0, (this.arena.height - this.tileConfig.spawnSize), this.arena.width, this.tileConfig.spawnSize); // bottom wall
+		this.arenaObjectLayer.weightedRandomize(wallWeight, 0, 0, this.tileConfig.spawnSize, this.arena.height); // left wall
+		this.arenaObjectLayer.weightedRandomize(wallWeight, (this.arena.width - this.tileConfig.spawnSize), 0, this.tileConfig.spawnSize, this.arena.height); // right wall
 		this.arenaObjectLayer.weightedRandomize(obstacleTileWeight, (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.arena.width - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))), (this.arena.height - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))));
 		this.arenaTrapLayer.weightedRandomize(trapTileWeight, (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.tileConfig.spawnSize + this.tileConfig.graceArea), (this.arena.width - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))), (this.arena.height - ((this.tileConfig.spawnSize * 2) + (this.tileConfig.graceArea * 2))));
 		this.arenaGroundLayer.weightedRandomize(neutralSlowTileWeight, this.tileConfig.spawnSize, this.tileConfig.spawnSize, (this.arena.width - (this.tileConfig.spawnSize * 2)), (this.arena.height - (this.tileConfig.spawnSize * 2)));
@@ -157,7 +185,7 @@ export default class Level extends Phaser.Scene {
 		// ])
 
 		/** Add collision */
-		this.arena.setCollision([5, 6, 7, 8, 9], true, true, this.arenaObjectLayer, true);
+		this.arena.setCollision([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], true, true, this.arenaObjectLayer, true);
 		this.arenaObjectLayer.setDepth(3);
 		this.arenaTrapLayer.setDepth(2);
 		this.arenaGroundLayer.setDepth(1);
@@ -184,7 +212,7 @@ export default class Level extends Phaser.Scene {
 		/** Player */
 		this.player = new Player(this, this.physics.world.bounds.width / 2, this.physics.world.bounds.height / 2, "player");
 		this.player.setOrigin(0.5);
-		this.player.setDepth(2);
+		this.player.setDepth(3);
 
 		/** Arena */
 		this.drawArena();
