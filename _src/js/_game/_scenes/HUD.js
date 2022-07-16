@@ -9,6 +9,7 @@ export default class HUD extends Phaser.Scene {
 
 		super(SCENE_KEY);
 
+		this.runClock = true;
 	}
 
 	/** Used to prepare data */
@@ -26,28 +27,31 @@ export default class HUD extends Phaser.Scene {
 
 		let level = this.scene.get("Level");
 
-		level.events.on("updateHUD", () => {
+		level.events.on("updateHUD", (data) => {
+			console.log("updateHUD", data);
+			/** Game ends for HUD */
+			if(data.complete && data.complete === true) {
+				this.runClock = false;
+			}
 
 		}, this);
 
 		/** CLock object */
 		let clockDimensions = { w: 200, h: 80 };
 
-		this.displayClock = new Geometry(this, (this.physics.world.bounds.width / 2) - (clockDimensions.w / 2), 0, {
-			width: clockDimensions.w,
-			height: clockDimensions.h
-		});
+		console.log(this.physics.world.width);
 
-		this.clock = this.add.text(500, 0, "", { font: "50px Crimson-Text", fill: "#FFFFFF" });
+		this.clock = this.add.text((window.Game.windowWidth / 2), 10, "", { font: "50px Crimson-Text", fill: "#FFFFFF", align: "left", fixedWidth: 200 }).setOrigin(0.5, 0);
+		this.clock.setStroke("#000000", 6);
 	}
 
 	updateGameClock(time) {
 
-		let seconds = Math.round((time / 1000) * 100) / 100;
-		let minutes = Math.floor(seconds / 60);
-		let display = `${(minutes > 0 ? minutes + ":" : "")}${seconds}`;
+		let fullSeconds = Math.round((time / 1000) * 100) / 100;
+		let minutes = Math.floor(fullSeconds / 60);
+		let seconds = fullSeconds - (minutes * 60);
+		let display = `${(minutes > 0 ? minutes + ":" : "   ")}${(seconds < 10) ? "0" + seconds.toFixed(2) : seconds.toFixed(2)}`;
 
-		
 		this.clock.setText(display);
 	}
 
@@ -55,7 +59,7 @@ export default class HUD extends Phaser.Scene {
 	update(time, delta) {
 
 		/** Update our game clock display */
-		this.updateGameClock(time);
+		if(this.runClock === true) this.updateGameClock(time);
 
 	}
 }

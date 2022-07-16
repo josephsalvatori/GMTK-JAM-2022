@@ -278,6 +278,11 @@ export default class Level extends Phaser.Scene {
 		this.cameras.main.zoom = this.zoom;
 		this.cameras.main.startFollow(this.player);
 		this.cameras.main.roundPixels = true;
+
+		/** Event Test */
+		this.events.emit("updateHUD", {
+			create: true
+		});
 	}
 
 	/** Used to update the game, like a run function for the scene */
