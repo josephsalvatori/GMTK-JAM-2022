@@ -93,12 +93,12 @@ export default class HUD extends Phaser.Scene {
 		upgrades = upgrades.sort(() => 0.5 - Math.random());
 		
 		let victoryDialog = this.add.dom(window.Game.windowWidth / 2, window.Game.windowHeight / 2).createFromHTML(`
-			<div style="text-align: center; width: 500px; height: 500px; margin-top: -250px; margin-left: -250px; background-color: #222222; font-size: 16px; font-family: 'Crimson-Text';">
-				<h2 style="color: #FFFFFF; font-size: 32px;">Victory!</h2>
-				<h4 style="color: #FFFFFF; font-size: 32px;">Select Two Upgrades</h4>
-				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con1">Press "1" - ${upgrades[0].name}</button>
-				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con2">Press "2" - ${upgrades[1].name}</button>
-				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con3">Press "3" - ${upgrades[2].name}</button>
+			<div style="text-align: center; width: 500px; height: 500px; margin-top: -250px; margin-right: -250px; background-color: #222222; font-size: 18px; font-family: 'Crimson-Text';">
+				<h2 style="color: #FFFFFF; font-size: 48px; font-family: 'Crimson-Text'; margin-bottom: 10px;">Victory!</h2>
+				<h4 style="color: #FFFFFF; font-size: 28px; font-family: 'Crimson-Text';">Select Two Upgrades</h4>
+				<button style="display: block; margin: 15px auto 0; background-color: #FFFFFF; color: #000000; display: block; outline: none; padding: 5px 8px; border-radius: 5px; font-family: 'Crimson-Text';" name="con1">Press "1" - ${upgrades[0].name}</button>
+				<button style="display: block; margin: 15px auto 0; background-color: #FFFFFF; color: #000000; display: block; outline: none; padding: 5px 8px; border-radius: 5px; font-family: 'Crimson-Text';" name="con2">Press "2" - ${upgrades[1].name}</button>
+				<button style="display: block; margin: 15px auto 0; background-color: #FFFFFF; color: #000000; display: block; outline: none; padding: 5px 8px; border-radius: 5px; font-family: 'Crimson-Text';" name="con3">Press "3" - ${upgrades[2].name}</button>
 			</div>
 		`).setOrigin(0.5, 0);
 
