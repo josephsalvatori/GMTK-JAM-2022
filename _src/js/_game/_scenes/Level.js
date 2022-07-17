@@ -16,8 +16,8 @@ export default class Level extends Phaser.Scene {
 		 */
 		this.tileConfig = {
 			size: 32,
-			x: 72,
-			y: 96
+			x: 68,
+			y: 92
 		};
 
 		/**
@@ -202,6 +202,8 @@ export default class Level extends Phaser.Scene {
 		this.arenaObjectLayer.setDepth(3);
 		this.arenaTrapLayer.setDepth(2);
 		this.arenaGroundLayer.setDepth(1);
+		this.arenaGroundLayer.alpha = 0.8;
+		this.arenaTrapLayer.alpha = 0.8;
 
 		// this.arenaTileMap = this.arenaObjectLayer.layer.data.map(array => {
 
@@ -284,8 +286,8 @@ export default class Level extends Phaser.Scene {
 			repeat: -1
 		});
 
-		this.zoom = 1;
-		this.scale = 1 / this.zoom;
+		this.zoom = 1.2;
+		// this.scale = 1 / this.zoom;
 		this.waveCount  = 0;
 		this.maxWaves   = 3;
 		this.enemyCount = 0;
