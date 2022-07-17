@@ -9,11 +9,15 @@ export default class PlayerData {
 			damage: 20,
 			speed: 4,
 
+			// affect damage and resulting force
 			mass: 1,
 			velocity: 1,
 			dash: 3,
 			critMult: 3,
-			dashLength: 180
+			dashLength: 180,
+
+			// game values
+			gamesPlayed: 0
 		};
 
 		/** Data store in window Object - hate get/set of DataManager */

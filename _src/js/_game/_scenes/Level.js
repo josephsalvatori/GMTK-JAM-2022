@@ -385,4 +385,14 @@ export default class Level extends Phaser.Scene {
 			});
 		}
 	}
+
+	/** See if the user has "won" */
+	checkVictory() {
+
+		// check if any enemies are alive
+		if(this.deathCount < this.enemyCount) return;
+
+		
+		
+	}
 }
