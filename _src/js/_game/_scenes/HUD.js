@@ -24,6 +24,8 @@ export default class HUD extends Phaser.Scene {
 	/** Used to add objects to the scene */
 	create(data) {
 
+		this.rewardCount = 0;
+
 		let level = this.scene.get("Level");
 		this.victoryScreenVisible = false;
 		level.events.on("updateHUD", (data) => {
@@ -54,8 +56,6 @@ export default class HUD extends Phaser.Scene {
 
 	runVictory() {
 		this.victoryScreenVisible = true;
-		
-
 
 		let upgrades = [
 			{
@@ -93,29 +93,38 @@ export default class HUD extends Phaser.Scene {
 		upgrades = upgrades.sort(() => 0.5 - Math.random());
 		
 		let victoryDialog = this.add.dom(window.Game.windowWidth / 2, window.Game.windowHeight / 2).createFromHTML(`
-		<div style="width: 300px; height: 300px; background: lime;">
-			<h2>Boxes Destroyed</h2>
-			<h4>Choose upgrade</h4>
-			<button name="con1">${upgrades[0].name}</button>
-			<button name="con2">${upgrades[1].name}</button>
-			<button name="con3">${upgrades[2].name}</button>
-		</div>
-	`).setOrigin(0.5, 0);
+			<div style="width: 300px; height: 300px; background: lime;">
+				<h2>Victory!</h2>
+				<h4>Select 2 Upgrades</h4>
+				<button name="con1">Press "1" - ${upgrades[0].name}</button>
+				<button name="con2">Press "2" - ${upgrades[1].name}</button>
+				<button name="con3">Press "3" - ${upgrades[2].name}</button>
+			</div>
+		`).setOrigin(0.5, 0);
 
 		let condition1 = victoryDialog.getChildByName("con1");
 		condition1.addEventListener("click", function(event){
-			this.events.emit("rewardSelected", upgrades[0]);
+			this.selectReward(upgrade[0]);
 		});
 		let condition2 = victoryDialog.getChildByName("con2");
 		condition2.addEventListener("click", function(event){
-			this.events.emit("rewardSelected", upgrades[1]);
+			this.selectReward(upgrade[1]);
 		});
-		let condition3 = victoryDialog.getChildByName("con2");
+		let condition3 = victoryDialog.getChildByName("con3");
 		condition3.addEventListener("click", function(event){
-			this.events.emit("rewardSelected", upgrades[2]);
-			
+			this.selectReward(upgrade[2]);
 		});
+	}
 
+	selectReward(upgrade) {
+
+		this.rewardCount++;
+
+		window.Game.data.player[upgrade.playerProperty] += upgrade.upgradeValue;
+
+		if(this.rewardCount >= 2){
+			// start new scene
+		}
 	}
 
 	/** Used to update the game, like a run function for the scene */

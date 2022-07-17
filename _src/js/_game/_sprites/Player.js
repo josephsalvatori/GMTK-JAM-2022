@@ -1,4 +1,3 @@
-import { relativeTimeThreshold } from "moment";
 import Phaser from "phaser";
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
