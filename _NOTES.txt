@@ -1,5 +1,13 @@
 Theme: Roll of the dice
 
+~~~!!!! https://www.pixilart.com/draw/tile-e97476aeea#
+
+TODO: Collision
+TODO: Damage / Death
+TODO: All Enemies / Results Scene
+TODO: 
+
+
 Legend:
 @ - Very considered
 # - Difficult to consider

@@ -64,6 +64,7 @@
     "webpack-virtual-modules": "^0.4.3"
   },
   "dependencies": {
+    "easystarjs": "^0.4.4",
     "moment": "^2.29.1",
     "phaser": "^3.55.2",
     "phaser-plugin-debug-draw": "^7.0.0",

@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import Enemy from "../_sprites/Enemy";
 import Player from "../_sprites/Player";
+import * as EasyStar from "easystarjs";
 
 const SCENE_KEY = "Level";
 
@@ -88,12 +89,15 @@ export default class Level extends Phaser.Scene {
 			frameWidth: 32,
 			frameHeight: 32
 		});
+		this.load.spritesheet("enemy", "/assets/imgs/enemy_debug.png", {
+			frameWidth: 32,
+			frameHeight: 32
+		});
 	}
 
 	drawArena() {
 
 		this.level = [];
-		this.enemies = 0;
 		this.wave = 0;
 
 		/**
@@ -117,14 +121,6 @@ export default class Level extends Phaser.Scene {
 			{ index: 7, weight: 18 },	// neutral variation 8
 			{ index: 8, weight: 16 },	// neutral variation 9
 			{ index: 9, weight: 14 },	// neutral variation 10
-			{ index: 21, weight: 10 },	// slowdown variant 1
-			{ index: 22, weight: 8 },	// slowdown variant 2
-			{ index: 23, weight: 6 },	// slowdown variant 3
-			{ index: 24, weight: 5 },	// slowdown variant 4
-			{ index: 25, weight: 4 },	// slowdown variant 5
-			{ index: 26, weight: 3 },	// slowdown variant 6
-			{ index: 27, weight: 2 },	// slowdown variant 7
-			{ index: 28, weight: 1 }	// slowdown variant 8
 		];
 
 		let obstacleTileWeight = [
@@ -142,7 +138,15 @@ export default class Level extends Phaser.Scene {
 			{ index: 28, weight: 3 },	// trap variation 1
 			{ index: 29, weight: 2 },	// trap variation 2
 			{ index: 30, weight: 2 },	// trap variation 3
-			{ index: 31, weight: 2 }	// trap variation 4
+			{ index: 31, weight: 2 },	// trap variation 4
+			{ index: 21, weight: 18 },	// slowdown variant 1
+			{ index: 22, weight: 14 },	// slowdown variant 2
+			{ index: 23, weight: 10 },	// slowdown variant 3
+			{ index: 24, weight: 8 },	// slowdown variant 4
+			{ index: 25, weight: 6 },	// slowdown variant 5
+			{ index: 26, weight: 4 },	// slowdown variant 6
+			{ index: 27, weight: 4 },	// slowdown variant 7
+			{ index: 28, weight: 3 }	// slowdown variant 8
 		];
 
 		let wallWeight = [
@@ -191,7 +195,13 @@ export default class Level extends Phaser.Scene {
 		this.arenaObjectLayer.setDepth(3);
 		this.arenaTrapLayer.setDepth(2);
 		this.arenaGroundLayer.setDepth(1);
-		// this.arenaGroundLayer.setAlpha(0.5); // Debug alpha
+
+		// this.arenaTileMap = this.arenaObjectLayer.layer.data.map(array => {
+
+		// 	let arr = array.map(obj => { return (!obj.index ? "0" : obj.index); });
+			
+		// 	return arr;
+		// });
 		
 		/** Debug Arena */
 		// this.arena.renderDebug(this.add.graphics(), {
@@ -204,75 +214,76 @@ export default class Level extends Phaser.Scene {
 
 		this.zoom = 1;
 		this.scale = 1 / this.zoom;
-		this.physics.world.setBounds(0, 0, this.tileConfig.size * this.tileConfig.x, this.tileConfig.size * this.tileConfig.y);
+		this.waveCount  = 0;
+		this.maxWaves   = 3;
+		this.enemyCount = 0;
+		this.deathCount = 0;
 
-		/** Grid */
+		this.worldWidth = this.tileConfig.size * this.tileConfig.x;
+		this.worldHeight = this.tileConfig.size * this.tileConfig.y;
+
+		this.matter.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
+
+		/** Grid
 		this.grid = this.add.grid(0, 0, this.tileConfig.size * this.tileConfig.x, this.tileConfig.size * this.tileConfig.y, this.tileConfig.size, this.tileConfig.size, undefined, undefined, 0xffffff, 0.25);
 		this.grid.setOrigin(0);
-		this.grid.setDepth(1);
-
-		/** Player */
-		this.player = new Player(this, this.physics.world.bounds.width / 2, this.physics.world.bounds.height / 2, "player");
-		this.player.setOrigin(0.5);
-		this.player.setDepth(3);
+		this.grid.setDepth(1); */
 
 		/** Arena */
 		this.drawArena();
 
-		/** Enemy Generator */
-		let enemiesToGenerate = 15;
+		/** Player */
+		this.player = new Player(this.matter.world, this.worldWidth / 2, this.worldHeight / 2, "player");
+		this.player.setOrigin(0.5);
+		this.player.setDepth(3);
 
+		/** Enemy Group Generation */
 		this.enemies = [];
+		this.enemyGroup = this.add.group(this.enemies);
 
-		let centerX = this.physics.world.bounds.width / 2; // center point X
-		let centerY = this.physics.world.bounds.height / 2; // center point Y
-		let offsetX = (window.Game.windowWidth / 2) * this.scale; // distance to offcamera from center X
-		let offsetY = (window.Game.windowHeight / 2) * this.scale; // distance to offcamera from center Y
-
-		// for(let i = 0; i < enemiesToGenerate; i++){
-
-		// 	let randX = centerX + ((offsetX + Math.ceil(Math.random() * 1000)) * (Math.round(Math.random()) ? 1 : -1));
-		// 	let randY = centerY + ((offsetY + Math.ceil(Math.random() * 1000)) * (Math.round(Math.random()) ? 1 : -1));
-		// 	let enemyName = `Enemy${i}`;
-
-		// 	this.enemies[i] = new Enemy(this, randX, randY, enemyName);
-		// 	this.enemies[i].setDepth(2);
-		// }
+		this.spawnEnemies(15);
 
 		/**
 		 * Collision
 		 */
-		/** Player vs. Tilemap */
-		this.physics.add.collider(this.player, this.arenaObjectLayer, (player, tile) => {
-
-			if(this.player.body.blocked.left){
-				this.player.onCollide(tile, "left");
-			} else if(this.player.body.blocked.right){
-				this.player.onCollide(tile, "right");
-			} else if(this.player.body.blocked.up){
-				this.player.onCollide(tile, "up");
-			} else if(this.player.body.blocked.down){
-				this.player.onCollide(tile, "down");
-			}
-			
-		}, null, this);
 
 		/** Player vs. Traps */
-		this.physics.add.overlap(this.player, this.arenaTrapLayer, (player, tile) => {
-			this.player.onOverlap(tile);
-		}, null, this);
+		// this.matter.overlap(this.player, this.arenaTrapLayer, (player, tile) => {
+		// 	this.player.onOverlap(tile);
+		// }, null, this);
+
+		
+		/** Player vs. Enemies */
+		// this.matter.(this.player, this.enemyGroup, (player, enemy) => {
+		// 	this.player.onCollide(enemy);
+		// });
+
+		/** Enemies vs. Enemies */
+		// this.matter.collider(this.enemyGroup, this.enemyGroup, (enemy1, enemy2) => {
+		// 	// this.player.onCollide(enemy);
+		// });
+
+		/** Player vs. Tilemap */
+		// this.matter.collider(this.player, this.arenaObjectLayer, (player, tile) => {
+
+		// 	if(this.player.body.blocked.left){
+		// 		this.player.onCollide(tile, "left");
+		// 	} else if(this.player.body.blocked.right){
+		// 		this.player.onCollide(tile, "right");
+		// 	} else if(this.player.body.blocked.up){
+		// 		this.player.onCollide(tile, "up");
+		// 	} else if(this.player.body.blocked.down){
+		// 		this.player.onCollide(tile, "down");
+		// 	}
+			
+		// }, null, this);
 
 		/** Enemies vs. Tilemap */
-		this.physics.add.collider(this.enemies, this.arenaObjectLayer, (enemy, tile) => {
+		// this.matter.collider(this.enemyGroup, this.arenaObjectLayer, (enemy, tile) => {
 			
-		}, null, this);
+		// }, null, this);
 
-		/** Player vs. Enemies */
-		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
-			this.player.onCollide(enemy);
-		});
-
-		// this.displayClock.setScrollFactor(0);
+		this.matter.world.convertTilemapLayer(this.arenaObjectLayer);
 
 		/** Camera - follow player */
 		this.cameras.main.zoom = this.zoom;
@@ -290,14 +301,88 @@ export default class Level extends Phaser.Scene {
 
 		/** Update our player */
 		this.player.update();
+
+		this.enemyGroup.getChildren().forEach((enemy)=>{
+			enemy.update();
+		});
 	}
 
-	render() {
+	/**
+	 * Enemy Spawner (randomized)
+	 * @param {number} enemiesToGenerate 
+	 */
+	spawnEnemies(enemiesToGenerate) {
 
-		console.log("render");
+		console.log("spawn enemies", enemiesToGenerate);
 
-		/** Debug */
+		// TODO: Fix out of bound spawning
 		
-		// this.game.debug.cameraInfo(this.game.cameras.main, 32, 32);
+		let centerX = this.player.x; // center point X
+		let centerY = this.player.y; // center point Y
+		let buffer = (this.tileConfig.size * 6);
+		let x1Max = this.player.x - buffer; // left distance from player we can spawn
+		let x2Max = ((this.tileConfig.size * this.tileConfig.x) - buffer) - this.player.x;  // right distance from player we can spawn
+		let y1Max = this.player.y - buffer; // top distance from player we can spawn
+		let y2Max = ((this.tileConfig.size * this.tileConfig.y) - buffer) - this.player.y;  // botton distance from player we can spawn
+		
+		let minDistance = 400;
+		let thisGroup = [];
+
+		let maxEnemies = enemiesToGenerate + this.enemies.length;
+
+		console.log(this.enemies.length, maxEnemies);
+
+		for(let i = this.enemies.length; i < maxEnemies; i++){
+
+			let offsetX = (x1Max < minDistance || window.Game.diceRoll(2) === 2 && x2Max > minDistance) ? x2Max : x1Max;
+			let offsetY = (y1Max < minDistance || window.Game.diceRoll(2) === 2 && y2Max > minDistance) ? y2Max : y1Max;
+
+			let disBetX = (centerX - offsetX);
+			let disBetY = (centerY - offsetY);
+
+			let randX = centerX + ((offsetX - window.Game.diceRoll(offsetX, minDistance)) * (disBetX > 0 ? -1 : 1));
+			let randY = centerY + ((offsetY - window.Game.diceRoll(offsetY, minDistance)) * (disBetY > 0 ? -1 : 1));
+
+			let enemyName = `Enemy${i}`;
+
+			this.enemies[i] = new Enemy(this.matter.world, randX, randY, "enemy", enemyName);
+			this.enemies[i].setDepth(3);
+
+			thisGroup.push(this.enemies[i]);
+
+			this.enemyGroup.add(this.enemies[i]);
+		}
+
+		console.log(this.enemies);
+
+		let thisGroupCount = thisGroup.length;
+
+		this.enemyCount = this.enemyCount + thisGroupCount;
+
+		this.player.setOnCollideWith(thisGroup, (target, collisionDetails)=>{
+
+			this.player.onCollide(target);
+
+			let playerRotation = this.player.rotation * (180 / Math.PI);
+			let playerPostion = {x: this.player.x, y: this.player.y};
+			let enemyPosition = target.position;
+			let enemyRotation = target.gameObject._rotation * (180/Math.PI);
+
+			// console.log(collisionDetails)
+		});
+
+		this.waveCount++
+
+		/** Start countdown to next wave */
+		if(this.waveCount < this.maxWaves) {
+
+			this.time.addEvent({
+				delay: 30000,
+				callback: () => {
+					console.log("spawn enemies");
+					this.spawnEnemies(thisGroupCount + window.Game.diceRoll());
+				}
+			});
+		}
 	}
 }

@@ -14,6 +14,9 @@ class Components {
 
 		/** Before customElements */
 		window.Game = window.Game || {};
+		window.Game.diceRoll = (sides = 6, min = 1) => {
+			return Math.floor(Math.random() * sides) + min;
+		};
 
 		/** Custom elements */
 		customElements.define("game-jam", GameJam);

@@ -5,8 +5,15 @@ export default class PlayerData {
 		/** Player data defaults */
 		this.name = "player";
 		this.data = {
-			"health": 100,
-			"speed": 5
+			health: 100,
+			damage: 20,
+			speed: 4,
+
+			mass: 1,
+			velocity: 1,
+			dash: 3,
+			critMult: 3,
+			dashLength: 180
 		};
 
 		/** Data store in window Object - hate get/set of DataManager */

@@ -3,6 +3,7 @@ import Boot from "Game/_scenes/Boot";
 import Menu from "Game/_scenes/Menu";
 import Level from "Game/_scenes/Level";
 import HUD from "Game/_scenes/HUD";
+import Results from "Game/_scenes/Results";
 
 /** Debug */
 import SceneWatcherPlugin from "phaser-plugin-scene-watcher";
@@ -26,8 +27,8 @@ export default class GameJam extends HTMLElement {
 				autoCenter: Phaser.Scale.CENTER_BOTH
 			},
 			physics: {
-				default: "arcade",
-				arcade: {
+				default: "matter",
+				matter: {
 					gravity: { y: 0 },
 					tileBias: 32, // !IMPORTANT - needed for proper tile collision detection, must match tilesize
 					debug: true
@@ -41,7 +42,8 @@ export default class GameJam extends HTMLElement {
 				Boot,
 				Menu,
 				Level,
-				HUD
+				HUD,
+				Results
 			],
 			/** Some debug object plugins */
 			plugins: {

@@ -39,7 +39,7 @@ export default class HUD extends Phaser.Scene {
 		/** CLock object */
 		let clockDimensions = { w: 200, h: 80 };
 
-		console.log(this.physics.world.width);
+		console.log(this.matter.world.width);
 
 		this.clock = this.add.text((window.Game.windowWidth / 2), 10, "", { font: "50px Crimson-Text", fill: "#FFFFFF", align: "left", fixedWidth: 200 }).setOrigin(0.5, 0);
 		this.clock.setStroke("#000000", 6);
