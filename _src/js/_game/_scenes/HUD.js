@@ -91,6 +91,10 @@ export default class HUD extends Phaser.Scene {
 		];
 
 		upgrades = upgrades.sort(() => 0.5 - Math.random());
+		let key1 = this.input.keyboard.addKey("1");
+		let key2 = this.input.keyboard.addKey("2");
+		let key3 = this.input.keyboard.addKey("3");
+
 		
 		let victoryDialog = this.add.dom(window.Game.windowWidth / 2, window.Game.windowHeight / 2).createFromHTML(`
 			<div style="width: 300px; height: 300px; background: lime;">
@@ -102,17 +106,18 @@ export default class HUD extends Phaser.Scene {
 			</div>
 		`).setOrigin(0.5, 0);
 
+		
 		let condition1 = victoryDialog.getChildByName("con1");
-		condition1.addEventListener("click", function(event){
-			this.selectReward(upgrade[0]);
+		condition1.addEventListener("click", (event)=>{
+			this.selectReward(upgrades[0]);
 		});
 		let condition2 = victoryDialog.getChildByName("con2");
-		condition2.addEventListener("click", function(event){
-			this.selectReward(upgrade[1]);
+		condition2.addEventListener("click", (event)=>{
+			this.selectReward(upgrades[1]);
 		});
 		let condition3 = victoryDialog.getChildByName("con3");
-		condition3.addEventListener("click", function(event){
-			this.selectReward(upgrade[2]);
+		condition3.addEventListener("click", (event)=>{
+			this.selectReward(upgrades[2]);
 		});
 	}
 
@@ -123,7 +128,8 @@ export default class HUD extends Phaser.Scene {
 		window.Game.data.player[upgrade.playerProperty] += upgrade.upgradeValue;
 
 		if(this.rewardCount >= 2){
-			// start new scene
+			
+			this.scene.start("Level");
 		}
 	}
 

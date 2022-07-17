@@ -30,7 +30,7 @@ export default class GameJam extends HTMLElement {
 				matter: {
 					gravity: { y: 0 },
 					tileBias: 32, // !IMPORTANT - needed for proper tile collision detection, must match tilesize
-					debug: true
+					debug: false
 				}
 			},
 			parent: "gamejam",
@@ -47,7 +47,7 @@ export default class GameJam extends HTMLElement {
 				Level,
 				HUD
 			],
-			/** Some debug object plugins */
+			/** Some debug object plugins *
 			plugins: {
 				global: [
 					{
@@ -67,7 +67,7 @@ export default class GameJam extends HTMLElement {
 			/** Console debugs */
 			callbacks: {
 				postBoot: function(game) {
-					game.plugins.get("SceneWatcherPlugin").watchAll();
+					// game.plugins.get("SceneWatcherPlugin").watchAll();
 				}
 			}
 		};
