@@ -231,7 +231,7 @@ export default class Level extends Phaser.Scene {
 		this.audio.collide_object = this.sound.add("object_collision");
 		this.audio.collide_enemy = this.sound.add("enemy_collision");
 		this.audio.player_dash = this.sound.add("player_dash", {
-			volume: 0.8
+			volume: 0.9
 		});
 		this.audio.crowd_base = this.sound.add("crowd_base", {
 			volume: 0
@@ -253,7 +253,7 @@ export default class Level extends Phaser.Scene {
 				this.audio.crowd_base
 			],
 			delay: 3000,
-			volume: { from: 0, to: 1 },
+			volume: { from: 0, to: 0.95 },
 			duration: 3000
 		});
 		this.tweens.add({
@@ -261,7 +261,7 @@ export default class Level extends Phaser.Scene {
 				this.audio.loop_base
 			],
 			delay: 3000,
-			volume: { from: 0, to: 0.35 },
+			volume: { from: 0, to: 0.25 },
 			duration: 3000
 		});
 
@@ -421,11 +421,12 @@ export default class Level extends Phaser.Scene {
 	 */
 	spawnEnemies(enemiesToGenerate) {
 
-		console.log("spawn enemies", enemiesToGenerate);
-
 		// TODO: Fix out of bound spawning
-		// let spawnSeconds = 30;
-		let spawnSeconds = 3;
+		let spawnSeconds = 25 - (window.Game.data.player.gamesWon);
+
+		// min spawn
+		if(spawnSeconds < 10) spawnSeconds = 10;
+		// let spawnSeconds = 3;
 		
 		let centerX = this.player.x; // center point X
 		let centerY = this.player.y; // center point Y
@@ -435,19 +436,19 @@ export default class Level extends Phaser.Scene {
 		let y1Max = this.player.y - buffer; // top distance from player we can spawn
 		let y2Max = ((this.tileConfig.size * this.tileConfig.y) - buffer) - this.player.y;  // botton distance from player we can spawn
 		
-		let minDistance = 400;
+		let minDistance = 150;
 		let thisGroup = [];
 
-		// let maxEnemies = enemiesToGenerate + this.enemies.length;
-		let maxEnemies = 5;
+		let maxEnemies = enemiesToGenerate + this.enemies.length + ((window.Game.data.player.gamesWon + this.waveCount) * 2);
+		// let maxEnemies = 2;
 
 		for(let i = this.enemies.length; i < maxEnemies; i++){
 
 			let offsetX = (x1Max < minDistance || window.Game.diceRoll(2) === 2 && x2Max > minDistance) ? x2Max : x1Max;
 			let offsetY = (y1Max < minDistance || window.Game.diceRoll(2) === 2 && y2Max > minDistance) ? y2Max : y1Max;
 
-			let disBetX = (centerX - offsetX);
-			let disBetY = (centerY - offsetY);
+			let disBetX = (centerX - (offsetX + minDistance));
+			let disBetY = (centerY - (offsetX + minDistance));
 
 			let randX = centerX + ((offsetX - window.Game.diceRoll(offsetX, minDistance)) * (disBetX > 0 ? -1 : 1));
 			let randY = centerY + ((offsetY - window.Game.diceRoll(offsetY, minDistance)) * (disBetY > 0 ? -1 : 1));
@@ -474,8 +475,6 @@ export default class Level extends Phaser.Scene {
 			let playerPostion = {x: this.player.x, y: this.player.y};
 			let enemyPosition = target.position;
 			let enemyRotation = target.gameObject._rotation * (180 / Math.PI);
-
-			// console.log(collisionDetails)
 		});
 
 		this.waveCount++;
@@ -500,29 +499,33 @@ export default class Level extends Phaser.Scene {
 
 		this.victory = true;
 
-		console.log(this.tweens);
-		// fade out audio
-		this.tweens.add({
-			targets: [
-				this.audio.crowd_base,
-				this.audio.loop_base
-			],
-			volume: { to: 0 },
-			duration: 1500,
-			onComplete: () => {
-				// this.audio.crowd_base.stop();
-				// this.audio.loop_base.stop();
-				this.scene.pause();
-			}
-		});
+		window.Game.data.player.gamesPlayed++;
+		window.Game.data.player.gamesWon++;
 
+		// console.log(this.tweens);
+		// fade out audio
+		// this.tweens.add({
+		// 	targets: [
+		// 		this.audio.crowd_base,
+		// 		this.audio.loop_base
+		// 	],
+		// 	volume: { to: 0 },
+		// 	duration: 1500,
+		// 	onComplete: () => {
+		// 		// this.audio.crowd_base.stop();
+		// 		// this.audio.loop_base.stop();
+		// 		this.scene.pause();
+		// 	}
+		// });
+
+		console.log("win");
+
+		this.scene.pause();
 
 		// TODO: Results Screen with random choices
 		this.events.emit("updateHUD", {
 			complete: true
 		});
-
-
 
 		// this.scene.start("Level")
 	}

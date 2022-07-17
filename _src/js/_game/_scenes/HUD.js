@@ -60,82 +60,80 @@ export default class HUD extends Phaser.Scene {
 		let upgrades = [
 			{
 				name: "Upgrade Damage",
-				playerPropery: "damage",
+				playerProperty: "damage",
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			},
 			{
 				name: "Upgrade Speed",
-				playerPropery: "speed",
-				upgradeValue: Math.floor(Math.random() * 6) + 2
+				playerProperty: "speed",
+				upgradeValue: (Math.random() * 0.5) + 0.1
 			},
 			{
 				name: "Upgrade Dash Speed",
-				playerPropery: "dash",
-				upgradeValue: Math.floor(Math.random() * 6) + 2
+				playerProperty: "dash",
+				upgradeValue: (Math.random() * 0.2) + 0.05
 			},
 			{
 				name: "Upgrade Mass",
-				playerPropery: "mass",
-				upgradeValue: Math.floor(Math.random() * 6) + 2
+				playerProperty: "mass",
+				upgradeValue: (Math.random() * 0.8) + 0.2
 			},
 			{
 				name: "Upgrade Dash Duration",
 				playerProperty: "dashLength",
-				upgradeValue: Math.floor(Math.random() * 6) + 2
+				upgradeValue: Math.floor(Math.random() * 10) + 2
 			},
 			{
 				name: "Upgrade Crit",
 				playerProperty: "critMult",
-				upgradeValue: Math.floor(Math.random() * 6) + 2
+				upgradeValue: (Math.random() * 0.2) + 0.05
 			}
 		];
 
 		upgrades = upgrades.sort(() => 0.5 - Math.random());
 		
-		
 		let victoryDialog = this.add.dom(window.Game.windowWidth / 2, window.Game.windowHeight / 2).createFromHTML(`
-			<div style="width: 300px; height: 300px; background: lime;">
-				<h2>Victory!</h2>
-				<h4>Select 2 Upgrades</h4>
-				<button name="con1">Press "1" - ${upgrades[0].name}</button>
-				<button name="con2">Press "2" - ${upgrades[1].name}</button>
-				<button name="con3">Press "3" - ${upgrades[2].name}</button>
+			<div style="text-align: center; width: 500px; height: 500px; margin-top: -250px; margin-left: -250px; background-color: #222222; font-size: 16px; font-family: 'Crimson-Text';">
+				<h2 style="color: #FFFFFF; font-size: 32px;">Victory!</h2>
+				<h4 style="color: #FFFFFF; font-size: 32px;">Select Two Upgrades</h4>
+				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con1">Press "1" - ${upgrades[0].name}</button>
+				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con2">Press "2" - ${upgrades[1].name}</button>
+				<button style="display: block; background-color: #FFFFFF; color: #000000;" name="con3">Press "3" - ${upgrades[2].name}</button>
 			</div>
 		`).setOrigin(0.5, 0);
 
-		
-		
 		let condition1 = victoryDialog.getChildByName("con1");
 		condition1.addEventListener("click", (event)=>{
-			condition1.style.opacity = .5;
+			condition1.style.opacity = 0.5;
 			this.selectReward(upgrades[0]);
 		});
 		let condition2 = victoryDialog.getChildByName("con2");
 		condition2.addEventListener("click", (event)=>{
-			condition2.style.opacity = .5;
+			condition2.style.opacity = 0.5;
 			this.selectReward(upgrades[1]);
 		});
 		let condition3 = victoryDialog.getChildByName("con3");
 		condition3.addEventListener("click", (event)=>{
-			condition3.style.opacity = .5;
+			condition3.style.opacity = 0.5;
 			this.selectReward(upgrades[2]);
 		});
 
 		let key1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		let key2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 		let key3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+
 		key1.on("up", () => { 
-			condition1.style.opacity = .5;
+			condition1.style.opacity = 0.5;
 			this.selectReward(upgrades[0]);
 		});
 
 		key2.on("up", () => { 
-			condition2.style.opacity = .5;
+			condition2.style.opacity = 0.5;
 			this.selectReward(upgrades[1]);
 		});
 
 		key3.on("up", () => { 
-			condition3.style.opacity = .5;
+			condition3.style.opacity = 0.5;
 			this.selectReward(upgrades[2]);
 		});
 		
@@ -144,9 +142,10 @@ export default class HUD extends Phaser.Scene {
 	selectReward(upgrade) {
 
 		this.rewardCount++;
-
+		console.log(window.Game.data.player);
 		window.Game.data.player[upgrade.playerProperty] += upgrade.upgradeValue;
-
+		console.log(window.Game.data.player);
+		
 		if(this.rewardCount >= 2){
 			
 			this.scene.start("Level");

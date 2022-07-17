@@ -33,12 +33,12 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 		 * 
 		 */
 		this.config = {
-			baseHealth: 100,
-			health: 100,
-			speed: 4 * ((Math.random() * (1 - 0.5)) + 0.5),
+			baseHealth: (100 + (window.Game.data.player.gamesWon * window.Game.diceRoll(50, 30))),
+			health: 100 + (window.Game.data.player.gamesWon * window.Game.diceRoll(50, 30)),
+			speed: 3.2 * ((Math.random() * (1 - 0.5)) + 0.5),
 			mass: 1,
 			velocity: 1,
-			followDistance: config.followDistance || 400,
+			followDistance: config.followDistance || 500,
 		};
 		this.stop = false;
 
