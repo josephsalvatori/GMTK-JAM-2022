@@ -76,7 +76,8 @@ export default class Level extends Phaser.Scene {
 
 		/** Random tileset */
 		let tilesets = [
-			"/assets/imgs/tileset_debug.png",
+			"/assets/imgs/tileset_2.png",
+			"/assets/imgs/tileset_3.png",
 			"/assets/imgs/tileset_stone_water_sand_lava.png",
 		];
 

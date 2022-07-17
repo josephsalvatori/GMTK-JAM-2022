@@ -64,13 +64,13 @@ export default class HUD extends Phaser.Scene {
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			},
 			{
-				name: "Upgrade Velocity",
-				playerPropery: "velocity",
+				name: "Upgrade Speed",
+				playerPropery: "speed",
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			},
 			{
 				name: "Upgrade Dash Speed",
-				playerPropery: "dashVelocity",
+				playerPropery: "dash",
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			},
 			{
@@ -80,21 +80,18 @@ export default class HUD extends Phaser.Scene {
 			},
 			{
 				name: "Upgrade Dash Duration",
-				playerProperty: "dashDuration",
+				playerProperty: "dashLength",
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			},
 			{
 				name: "Upgrade Crit",
-				playerProperty: "baseCrit",
+				playerProperty: "critMult",
 				upgradeValue: Math.floor(Math.random() * 6) + 2
 			}
 		];
 
 		upgrades = upgrades.sort(() => 0.5 - Math.random());
-		let key1 = this.input.keyboard.addKey("1");
-		let key2 = this.input.keyboard.addKey("2");
-		let key3 = this.input.keyboard.addKey("3");
-
+		
 		
 		let victoryDialog = this.add.dom(window.Game.windowWidth / 2, window.Game.windowHeight / 2).createFromHTML(`
 			<div style="width: 300px; height: 300px; background: lime;">
@@ -107,18 +104,41 @@ export default class HUD extends Phaser.Scene {
 		`).setOrigin(0.5, 0);
 
 		
+		
 		let condition1 = victoryDialog.getChildByName("con1");
 		condition1.addEventListener("click", (event)=>{
+			condition1.style.opacity = .5;
 			this.selectReward(upgrades[0]);
 		});
 		let condition2 = victoryDialog.getChildByName("con2");
 		condition2.addEventListener("click", (event)=>{
+			condition2.style.opacity = .5;
 			this.selectReward(upgrades[1]);
 		});
 		let condition3 = victoryDialog.getChildByName("con3");
 		condition3.addEventListener("click", (event)=>{
+			condition3.style.opacity = .5;
 			this.selectReward(upgrades[2]);
 		});
+
+		let key1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+		let key2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
+		let key3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+		key1.on("up", () => { 
+			condition1.style.opacity = .5;
+			this.selectReward(upgrades[0]);
+		});
+
+		key2.on("up", () => { 
+			condition2.style.opacity = .5;
+			this.selectReward(upgrades[1]);
+		});
+
+		key3.on("up", () => { 
+			condition3.style.opacity = .5;
+			this.selectReward(upgrades[2]);
+		});
+		
 	}
 
 	selectReward(upgrade) {

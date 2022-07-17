@@ -42,6 +42,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			}
 		};
 
+		console.log(this.config);
+
 		/**
 		 * Controls
 		 */

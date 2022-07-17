@@ -5,8 +5,8 @@ import Level from "Game/_scenes/Level";
 import HUD from "Game/_scenes/HUD";
 
 /** Debug */
-import SceneWatcherPlugin from "phaser-plugin-scene-watcher";
-import DebugDrawPlugin from "phaser-plugin-debug-draw";
+// import SceneWatcherPlugin from "phaser-plugin-scene-watcher";
+// import DebugDrawPlugin from "phaser-plugin-debug-draw";
 
 export default class GameJam extends HTMLElement {
 
