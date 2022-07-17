@@ -16,8 +16,8 @@ export default class Level extends Phaser.Scene {
 		 */
 		this.tileConfig = {
 			size: 32,
-			x: 80,
-			y: 100
+			x: 72,
+			y: 96
 		};
 
 		/**
@@ -69,8 +69,6 @@ export default class Level extends Phaser.Scene {
 	/** Used to prepare data */
 	init() {
 		console.log("getData", this.registry.get("player"));
-
-		this.scene.launch("HUD");
 	}
 
 	/** Used for preloading assets (image, audio) into the scene */
@@ -85,14 +83,22 @@ export default class Level extends Phaser.Scene {
 		let tilesetIndex = Math.floor(Math.random() * tilesets.length);
 
 		this.load.image("tiles", tilesets[tilesetIndex]);
-		this.load.spritesheet("player", "/assets/imgs/player_debug.png", {
+		this.load.spritesheet("player", "/assets/imgs/wolf.png", {
 			frameWidth: 32,
 			frameHeight: 32
 		});
-		this.load.spritesheet("enemy", "/assets/imgs/enemy_debug.png", {
+		this.load.spritesheet("enemy", "/assets/imgs/demon.png", {
 			frameWidth: 32,
 			frameHeight: 32
 		});
+
+		/** Audio in scene */
+		this.load.audio("object_collision", "/assets/audio/object_collision.wav");
+		this.load.audio("enemy_collision", "/assets/audio/enemy_collision.wav");
+		this.load.audio("player_dash", "/assets/audio/player_dash.wav");
+		this.load.audio("crowd_base", "/assets/audio/crowd_base.mp3");
+		this.load.audio("crowd_deathswell", "/assets/audio/crowd_deathswell.mp3");
+		this.load.audio("loop_base", "/assets/audio/loop_scifi.mp3");
 	}
 
 	drawArena() {
@@ -211,6 +217,71 @@ export default class Level extends Phaser.Scene {
 
 	/** Used to add objects to the scene */
 	create(data) {
+		
+		// this.scene.pause();
+		this.victory = false;
+		this.scene.launch("HUD");
+		this.sound.pauseOnBlur = false;
+
+		/** Create some audio */
+		this.audio = {};
+		this.audio.collide_object = this.sound.add("object_collision");
+		this.audio.collide_enemy = this.sound.add("enemy_collision");
+		this.audio.player_dash = this.sound.add("player_dash", {
+			volume: 0.8
+		});
+		this.audio.crowd_base = this.sound.add("crowd_base", {
+			volume: 0
+		});
+		this.audio.crowd_base.play({
+			loop: true
+		});
+		this.audio.crowd_deathswell = this.sound.add("crowd_deathswell");
+		this.audio.loop_base = this.sound.add("loop_base", {
+			volume: 0
+		});
+		this.audio.loop_base.play({
+			loop: true
+		});
+
+		/** Fade in our audios */
+		this.tweens.add({
+			targets: [
+				this.audio.crowd_base
+			],
+			delay: 3000,
+			volume: { from: 0, to: 1 },
+			duration: 3000
+		});
+		this.tweens.add({
+			targets: [
+				this.audio.loop_base
+			],
+			delay: 3000,
+			volume: { from: 0, to: 0.35 },
+			duration: 3000
+		});
+
+		
+
+		/** Animations */
+		this.anims.create({
+			key: "enemy_walk",
+			frames: this.anims.generateFrameNumbers("enemy", { start: 16, end: 23 }),
+			frameRate: 8,
+			repeat: -1
+		});
+		this.anims.create({
+			key: "enemy_dead",
+			frames: this.anims.generateFrameNumbers("enemy", { start: 32, end: 39 }),
+			frameRate: 8
+		});
+		this.anims.create({
+			key: "player_walk",
+			frames: this.anims.generateFrameNumbers("player", { end: 15 }),
+			frameRate: 8,
+			repeat: -1
+		});
 
 		this.zoom = 1;
 		this.scale = 1 / this.zoom;
@@ -245,14 +316,46 @@ export default class Level extends Phaser.Scene {
 
 		/**
 		 * Collision
+		 * 	- audio manager
 		 */
+		this.objectCollidePlaying = false;
+		this.enemyCollidePlayer = [];
+
+		this.matter.world.on("collisionstart", (event, obj1, obj2) => {
+
+			if(!obj1.gameObject) return;
+			if(!obj2.gameObject) return;
+
+			/** Enemy */
+			if(obj1.gameObject.label == "Player" && obj2.gameObject.label == "Enemy") {
+				
+				if(this.enemyCollidePlayer[obj2.gameObject.name] === true) return;
+
+				this.enemyCollidePlayer[obj2.gameObject.name] = true;
+
+				setTimeout(() => this.enemyCollidePlayer[obj2.gameObject.name] = false, 1000);
+
+				this.audio.collide_enemy.play();
+			}
+
+			/** Pillar / Wall */
+			if(obj1.gameObject.label == "Player" && obj2.gameObject.label != "Enemy") {
+
+				if(this.objectCollidePlaying === true) return;
+
+				this.objectCollidePlaying = true;
+
+				setTimeout(() => this.objectCollidePlaying = false, 1000);
+
+				if(this.player.config.isDashing) this.audio.collide_object.play();
+			}
+		});
 
 		/** Player vs. Traps */
 		// this.matter.overlap(this.player, this.arenaTrapLayer, (player, tile) => {
 		// 	this.player.onOverlap(tile);
 		// }, null, this);
 
-		
 		/** Player vs. Enemies */
 		// this.matter.(this.player, this.enemyGroup, (player, enemy) => {
 		// 	this.player.onCollide(enemy);
@@ -299,6 +402,8 @@ export default class Level extends Phaser.Scene {
 	/** Used to update the game, like a run function for the scene */
 	update(time, delta) {
 
+		this.checkVictory();
+
 		/** Update our player */
 		this.player.update();
 
@@ -316,6 +421,8 @@ export default class Level extends Phaser.Scene {
 		console.log("spawn enemies", enemiesToGenerate);
 
 		// TODO: Fix out of bound spawning
+		// let spawnSeconds = 30;
+		let spawnSeconds = 3;
 		
 		let centerX = this.player.x; // center point X
 		let centerY = this.player.y; // center point Y
@@ -328,9 +435,8 @@ export default class Level extends Phaser.Scene {
 		let minDistance = 400;
 		let thisGroup = [];
 
-		let maxEnemies = enemiesToGenerate + this.enemies.length;
-
-		console.log(this.enemies.length, maxEnemies);
+		// let maxEnemies = enemiesToGenerate + this.enemies.length;
+		let maxEnemies = 5;
 
 		for(let i = this.enemies.length; i < maxEnemies; i++){
 
@@ -353,33 +459,30 @@ export default class Level extends Phaser.Scene {
 			this.enemyGroup.add(this.enemies[i]);
 		}
 
-		console.log(this.enemies);
-
 		let thisGroupCount = thisGroup.length;
 
 		this.enemyCount = this.enemyCount + thisGroupCount;
 
-		this.player.setOnCollideWith(thisGroup, (target, collisionDetails)=>{
+		this.player.setOnCollideWith(thisGroup, (target, collisionDetails) => {
 
 			this.player.onCollide(target);
 
 			let playerRotation = this.player.rotation * (180 / Math.PI);
 			let playerPostion = {x: this.player.x, y: this.player.y};
 			let enemyPosition = target.position;
-			let enemyRotation = target.gameObject._rotation * (180/Math.PI);
+			let enemyRotation = target.gameObject._rotation * (180 / Math.PI);
 
 			// console.log(collisionDetails)
 		});
 
-		this.waveCount++
+		this.waveCount++;
 
 		/** Start countdown to next wave */
 		if(this.waveCount < this.maxWaves) {
 
 			this.time.addEvent({
-				delay: 30000,
+				delay: spawnSeconds * 1000,
 				callback: () => {
-					console.log("spawn enemies");
 					this.spawnEnemies(thisGroupCount + window.Game.diceRoll());
 				}
 			});
@@ -390,9 +493,34 @@ export default class Level extends Phaser.Scene {
 	checkVictory() {
 
 		// check if any enemies are alive
-		if(this.deathCount < this.enemyCount) return;
+		if(this.deathCount < this.enemyCount || this.waveCount < this.maxWaves || this.victory === true) return;
 
-		
-		
+		this.victory = true;
+
+		console.log(this.tweens);
+		// fade out audio
+		this.tweens.add({
+			targets: [
+				this.audio.crowd_base,
+				this.audio.loop_base
+			],
+			volume: { to: 0 },
+			duration: 1500,
+			onComplete: () => {
+				// this.audio.crowd_base.stop();
+				// this.audio.loop_base.stop();
+				this.scene.pause();
+			}
+		});
+
+
+		// TODO: Results Screen with random choices
+		this.events.emit("updateHUD", {
+			complete: true
+		});
+
+
+
+		// this.scene.start("Level")
 	}
 }

@@ -15,6 +15,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
 		super(world, x, y, frame, texture);
 
+		this.name = "Player";
+		this.label = "Player";
+		this.activePlaying = false;
+
 		this.scene.add.existing(this);
 
 		this.setTexture(texture);
@@ -74,6 +78,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
 		/** Stand still */
 		this.setVelocity(0);
+		
 
 		/** Base Velocity */
 		let m = 1; // this is scene: currentTile movement multiplier
@@ -84,6 +89,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 		 * 	- Cannot take damage during dash
 		 */
 		if(dashBtnPressed && this.config.isDashing === false){
+
+			this.scene.audio.player_dash.play();
 			
 			this.config.isDashing = true;
 			this.config.isColliding = false;
@@ -128,6 +135,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			btnsDown++;
 			vel.y = (v * playerData.speed) * -1;
 			this.setVelocityY(vel.y);
+			this.isPlaying = true;
 		}
 
 		/** Left */
@@ -135,6 +143,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			btnsDown++;
 			vel.x = (v * playerData.speed) * -1;
 			this.setVelocityX(vel.x);
+			this.isPlaying = true;
 		}
 
 		/** Down */
@@ -142,6 +151,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			btnsDown++;
 			vel.y = (v * playerData.speed);
 			this.setVelocityY(vel.y);
+			this.isPlaying = true;
 		}
 
 		/** Right */
@@ -149,6 +159,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			btnsDown++;
 			vel.x = (v * playerData.speed);
 			this.setVelocityX(vel.x);
+			this.isPlaying = true;
 		}
 
 		/** Correct Diagonal */
@@ -182,6 +193,15 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 		} else if(this.controls.A?.isDown) { // Left
 			this.facingDir = ["", "left"];
 			this.setRotation(Phaser.Math.DegToRad(270));
+		}
+
+		if(this.isPlaying === false && this.activePlaying === false) {
+			this.activePlaying = true;
+			this.anims.play("player_walk");
+		} else {
+			this.activePlaying = false;
+			this.isPlaying = false;
+			this.anims.pause();
 		}
 	}
 

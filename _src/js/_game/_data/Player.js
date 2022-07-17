@@ -6,6 +6,8 @@ export default class PlayerData {
 		this.name = "player";
 		this.data = {
 			health: 100,
+
+			// upgradeable values
 			damage: 20,
 			speed: 4,
 
@@ -17,7 +19,11 @@ export default class PlayerData {
 			dashLength: 180,
 
 			// game values
-			gamesPlayed: 0
+			gamesPlayed: 0, // counts playthroughs
+			gamesWon: 0, // counts victories
+			timeScale: 1, // scale time based events: rate of enemy spawn
+			spawnScale: 1, // scale enemy spawn count
+			enemyScale: 1, // enemy difficulty scale: damage? health?
 		};
 
 		/** Data store in window Object - hate get/set of DataManager */

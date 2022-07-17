@@ -15,8 +15,10 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 		super(world, x, y, undefined, texture);
 
 		this.name = name;
+		this.label = "Enemy";
 
 		this.scene.add.existing(this);
+		this.isPlaying = false;
 
 		this.setTexture(texture);
 
@@ -66,9 +68,17 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 
 		if(this.stop === true) return;
 
+		if(this.isPlaying === false) {
+			this.isPlaying = true;
+			this.anims.play("enemy_walk");
+		}
+
 		let dis = Phaser.Math.Distance.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
 
 		if(dis > this.config.followDistance) {
+
+			this.isPlaying = false;
+			this.anims.pause();
 
 			this.setVelocity(0);
 
@@ -134,16 +144,12 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 	/** Play death, set dead texture obj */
 	death() {
 
-		console.log(this.name, "is Dead");
-		
 		this.scene.deathCount++;
 
-		console.log(this.scene.deathCount, this.scene.enemyCount, this.scene.waveCount, this.scene.maxWaves);
+		this.anims.pause();
+		this.anims.play("enemy_dead");
+		this.scene.audio.crowd_deathswell.play();
 
-		if(this.scene.deathCount >= this.scene.enemyCount && this.scene.waveCount >= this.scene.maxWaves){
-			// TODO: Results Screen with random choices
-			console.log("hey, you won");
-		}
 		// this.setToSleep();
 	}
 }

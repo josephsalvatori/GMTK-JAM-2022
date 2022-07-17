@@ -7,6 +7,11 @@ TODO: Damage / Death
 TODO: All Enemies / Results Scene
 TODO: 
 
+~~~ Credits:
+Demon enemy character from Warlock's Gauntlet.
+
+Warlock's Gauntlet artists - rAum, jackFlower, DrZoliparia, Neil2D
+~~~~~~~~~~~
 
 Legend:
 @ - Very considered
