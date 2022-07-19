@@ -30,7 +30,7 @@ export default class GameJam extends HTMLElement {
 				matter: {
 					gravity: { y: 0 },
 					tileBias: 32, // !IMPORTANT - needed for proper tile collision detection, must match tilesize
-					debug: false
+					debug: true
 				}
 			},
 			parent: "gamejam",

@@ -223,6 +223,11 @@ export default class Level extends Phaser.Scene {
 		
 		// this.scene.pause();
 		this.victory = false;
+
+		if(this.scene.get("HUD")) {
+			this.scene.stop("HUD");
+		}
+		
 		this.scene.launch("HUD");
 		this.sound.pauseOnBlur = false;
 
@@ -421,42 +426,57 @@ export default class Level extends Phaser.Scene {
 	 */
 	spawnEnemies(enemiesToGenerate) {
 
-		// TODO: Fix out of bound spawning
-		let spawnSeconds = 25 - (window.Game.data.player.gamesWon);
+		let spawnSeconds = 30 - (window.Game.data.player.gamesWon);
 
 		// min spawn
-		if(spawnSeconds < 10) spawnSeconds = 10;
-		// let spawnSeconds = 3;
-		
-		let centerX = this.player.x; // center point X
-		let centerY = this.player.y; // center point Y
+		if(spawnSeconds < 15) spawnSeconds = 15;
+
 		let buffer = (this.tileConfig.size * 6);
-		let x1Max = this.player.x - buffer; // left distance from player we can spawn
-		let x2Max = ((this.tileConfig.size * this.tileConfig.x) - buffer) - this.player.x;  // right distance from player we can spawn
-		let y1Max = this.player.y - buffer; // top distance from player we can spawn
-		let y2Max = ((this.tileConfig.size * this.tileConfig.y) - buffer) - this.player.y;  // botton distance from player we can spawn
-		
+		let playerX = this.player.x; // center point X
+		let playerY = this.player.y; // center point Y
+		let arenaBounds = {
+			left: buffer,
+			right: (this.tileConfig.size * this.tileConfig.x) - buffer,
+			top: buffer,
+			bottom: (this.tileConfig.size * this.tileConfig.y) - buffer
+		};
+
+		let playerBounds = {
+			left: this.player.x - buffer,
+			right: this.player.x + buffer,
+			top: this.player.y - buffer,
+			bottom: this.player.y + buffer,
+		};
+
+		let spawnRange = {
+			left: playerBounds.left - arenaBounds.left,
+			right: playerBounds.right - arenaBounds.right,
+			top: playerBounds.top - arenaBounds.top,
+			bottom: playerBounds.bottom - arenaBounds.bottom
+		}
+
 		let minDistance = 150;
 		let thisGroup = [];
 
 		let maxEnemies = enemiesToGenerate + this.enemies.length + ((window.Game.data.player.gamesWon + this.waveCount) * 2);
-		// let maxEnemies = 2;
 
 		for(let i = this.enemies.length; i < maxEnemies; i++){
 
-			let offsetX = (x1Max < minDistance || window.Game.diceRoll(2) === 2 && x2Max > minDistance) ? x2Max : x1Max;
-			let offsetY = (y1Max < minDistance || window.Game.diceRoll(2) === 2 && y2Max > minDistance) ? y2Max : y1Max;
+			let rollA = window.Game.diceRoll(2, 1);
+			let rollB = window.Game.diceRoll(2, 1);
+			let selectedX = (rollA === 2) ? ((Math.abs(spawnRange.right) > minDistance) ? spawnRange.right : spawnRange.left) : ((Math.abs(spawnRange.left) > minDistance) ? spawnRange.left : spawnRange.right);
+			let selectedY = (rollB === 2) ? ((Math.abs(spawnRange.top) > minDistance) ? spawnRange.top : spawnRange.bottom) : ((Math.abs(spawnRange.bottom) > minDistance) ? spawnRange.bottom : spawnRange.top);
+			let rollC = window.Game.diceRoll(Math.abs(selectedX), minDistance);
+			let rollD = window.Game.diceRoll(Math.abs(selectedY), minDistance);
+			let randX = playerX - (rollC * (selectedX < 0 ? -1 : 1));
+			let randY = playerY - (rollD * (selectedY < 0 ? -1 : 1));
 
-			let disBetX = (centerX - (offsetX + minDistance));
-			let disBetY = (centerY - (offsetX + minDistance));
-
-			let randX = centerX + ((offsetX - window.Game.diceRoll(offsetX, minDistance)) * (disBetX > 0 ? -1 : 1));
-			let randY = centerY + ((offsetY - window.Game.diceRoll(offsetY, minDistance)) * (disBetY > 0 ? -1 : 1));
-
-			let enemyName = `Enemy${i}`;
-
-			this.enemies[i] = new Enemy(this.matter.world, randX, randY, "enemy", enemyName);
+			this.enemies[i] = new Enemy(this.matter.world, randX, randY, "enemy", `Enemy${i}`);
 			this.enemies[i].setDepth(3);
+
+			this.enemies[i].setOnCollide((collisionDetails) => {
+				this.enemies[i].onCollide(collisionDetails);
+			});
 
 			thisGroup.push(this.enemies[i]);
 
@@ -466,15 +486,9 @@ export default class Level extends Phaser.Scene {
 		let thisGroupCount = thisGroup.length;
 
 		this.enemyCount = this.enemyCount + thisGroupCount;
-
+		
 		this.player.setOnCollideWith(thisGroup, (target, collisionDetails) => {
-
-			this.player.onCollide(target);
-
-			let playerRotation = this.player.rotation * (180 / Math.PI);
-			let playerPostion = {x: this.player.x, y: this.player.y};
-			let enemyPosition = target.position;
-			let enemyRotation = target.gameObject._rotation * (180 / Math.PI);
+			this.player.onCollide(target, collisionDetails);
 		});
 
 		this.waveCount++;

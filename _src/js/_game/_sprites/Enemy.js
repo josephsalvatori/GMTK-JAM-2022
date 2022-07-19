@@ -39,8 +39,14 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 			mass: 1,
 			velocity: 1,
 			followDistance: config.followDistance || 500,
+			hitPos: {
+				x: 0,
+				y: 0
+			}
 		};
 		this.stop = false;
+		this.isDead = false;
+		this.transferDamage = null;
 
 		/**
 		 * Color
@@ -101,49 +107,91 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
 		return { velX: move * Math.sin(direction), velY: move * Math.cos(direction) };
 	}
 
-	onCollide(target) {
+	onCollide(data) {
 
+		if(!data.bodyA.gameObject) return;
+
+		let otherBody = (data.bodyA.id === this.body.id) ? data.bodyB : data.bodyA;
+
+		/** Check enemy on enemy hit, then check if transfer damage is passing */
+		if(!otherBody.gameObject || otherBody.gameObject.label != "Enemy") return;
+
+		/** Only when other enemy passes damage to this enemy */
+		if(!otherBody.gameObject.transferDamage || otherBody.gameObject.transferDamage <= 2) return;
+
+		/** First, split the transfer damage in half */
+		let transferDmg = (Math.floor(otherBody.gameObject.transferDamage / 2));
+
+		otherBody.gameObject.transferDamage = transferDmg;
+
+		console.log(`${otherBody.gameObject.name} passing ${transferDmg} to ${this.name}`)
+
+		/** Now damage the other enemy, and pass x, y, d */
+		this.damage(transferDmg, otherBody.gameObject.config.hitPos.x, otherBody.gameObject.config.hitPos.y, (otherBody.gameObject.config.mass * 200));
 	}
 
 	/** Enemy has been hit, launch it, then kill it */
-	damage(dmg) {
+	damage(dmg, x = null, y = null, d = null) {
+
+		let setX = (x ? x : this.scene.player.config.dashPos.x);
+		let setY = (y ? y : this.scene.player.config.dashPos.y);
 
 		/** Calculate the damage penalty due to being outside of distance sweetspot */
-		let dis = Phaser.Math.Distance.Between(this.x, this.y, this.scene.player.config.dashPos.x, this.scene.player.config.dashPos.y);
-		let dur = this.scene.player.config.dashDuration;
-		let prime = Math.round(dur / 2);
-		let disPen = Math.round((dis < prime) ? prime - dis : dis - prime);
+		let dis = Phaser.Math.Distance.Between(this.x, this.y, setX, setY);
+		let dur = d ? d : this.scene.player.config.dashDuration;
+		let prime = Math.round(dur / 2); // ideal distance for transfer
+		let disPen = Math.round((dis < prime) ? prime - dis : dis - prime); // penalty
 
-		this.config.health = this.config.health - (dmg - disPen);
+		let dmgDone = (dmg - disPen);
+
+		this.transferDamage = (dmgDone > 0) ? dmgDone : null;
+
+		if(this.config.health > 0 && dmgDone > 0) {
+			this.config.health = this.config.health - dmgDone;
+		}
+
+		this.config.hitPos = {
+			x: this.x,
+			y: this.y
+		};
 
 		/** Health under 20% */
 		if(this.config.health > 0 && (this.config.health / this.config.baseHealth) < 0.2) {
 			console.log("Enemy is weak");
 		}
 
-		/** Death */
-		if(this.config.health <= 0) {
+		/** Otherwise kill it */
+		if(this.config.health <= 0 && this.isDead === false) this.death();
 
-			const direction = Math.atan2((this.y - this.scene.player.y), (this.x - this.scene.player.x)) + 1.5708;
+		/** Now transfer push */
+		if(dmgDone > 0) {
+
+			this.stop = true;
+
+			const direction = Math.atan2((this.y - setY), (this.x - setX)) + 1.5708;
 			
 			this.setVelocity(0);
-			this.setMass(this.config.mass * 3);
 
-			let force = (this.config.health * -1) / window.Game.diceRoll(6, 4);
+			let forceCap = 250;
+			let forceRate = (dmgDone > forceCap) ? forceCap : dmgDone;
+			let force = (forceRate * -1) / window.Game.diceRoll(6, 4);
 
 			this.setVelocity(Math.sin(direction) * force, Math.cos(direction) * force);
-
-			if(this.stop === false){
-
-				this.stop = true;
-				this.death();
-			}
 		}
+
+		setTimeout(()=>{
+
+			this.transferDamage = null;
+
+			if(this.isDead === false) this.stop = false;
+
+		}, 1000);
 	}
 
 	/** Play death, set dead texture obj */
 	death() {
 
+		this.isDead = true;
 		this.scene.deathCount++;
 
 		this.anims.pause();

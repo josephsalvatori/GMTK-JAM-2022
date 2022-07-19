@@ -27,14 +27,17 @@ export default class HUD extends Phaser.Scene {
 		this.rewardCount = 0;
 
 		let level = this.scene.get("Level");
+
 		this.victoryScreenVisible = false;
+
 		level.events.on("updateHUD", (data) => {
 			/** Game ends for HUD */
 			if(data.complete && data.complete === true) {
+
 				this.runClock = false;
+
 				if(!this.victoryScreenVisible) this.runVictory();
 			}
-
 		}, this);
 
 		/** CLock object */
@@ -142,13 +145,17 @@ export default class HUD extends Phaser.Scene {
 	selectReward(upgrade) {
 
 		this.rewardCount++;
-		console.log(window.Game.data.player);
+		
 		window.Game.data.player[upgrade.playerProperty] += upgrade.upgradeValue;
-		console.log(window.Game.data.player);
 		
 		if(this.rewardCount >= 2){
 			
-			this.scene.start("Level");
+			console.log(this.game, this.scene);
+
+			this.sound.removeAll();			
+			this.scene.start("Level", {
+				"message": "Start Next Level"
+			});
 		}
 	}
 

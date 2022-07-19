@@ -15,6 +15,7 @@ export default class PlayerData {
 			mass: 1,
 			velocity: 1,
 			dash: 3,
+			critChance: 3,
 			critMult: 3,
 			dashLength: 180,
 

@@ -34,6 +34,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			baseDashDuration: window.Game.data.player.dashLength,
 			dashDuration: window.Game.data.player.dashLength,
 			baseCrit: window.Game.data.player.critMult,
+			critChance: window.Game.data.player.critChance,
+			lastDamage: 0,
 			isDashing: false,
 			isColliding: false,
 			dashPos: {
@@ -228,7 +230,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 			this.config.isColliding = true; // Resets upon dash
 
 			let damage = Math.ceil((this.config.damage * (this.config.velocity * this.body.mass)) * ((Math.random() * 0.2) + 1.1));
-			let critical = (window.Game.diceRoll(20) > 18) ? this.config.baseCrit : 1;
+			let critical = (window.Game.diceRoll(20, (20 * (this.config.critChance / 100))) > 18) ? this.config.baseCrit : 1;
+			
+			this.config.lastDamage = damage * critical;
 			
 			target.gameObject.damage(damage * critical);
 
